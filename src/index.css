@@ -17,26 +17,49 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Verde vibrante do Click Serviços */
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 142 71% 40%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Verde mais claro */
+    --secondary: 142 71% 90%;
+    --secondary-foreground: 142 71% 20%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Cores adicionais do Click Serviços */
+    --navy: 222 84% 15%;
+    --navy-light: 222 84% 25%;
+    --success: 142 71% 45%;
+    --warning: 45 93% 58%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 142 71% 45%;
 
-    --radius: 0.5rem;
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(142 71% 97%) 100%);
+    --gradient-navy: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--navy-light)) 100%);
+
+    /* Sombras */
+    --shadow-soft: 0 4px 6px -1px hsl(var(--primary) / 0.1), 0 2px 4px -1px hsl(var(--primary) / 0.06);
+    --shadow-medium: 0 10px 15px -3px hsl(var(--primary) / 0.1), 0 4px 6px -2px hsl(var(--primary) / 0.05);
+    --shadow-large: 0 25px 50px -12px hsl(var(--primary) / 0.25);
+
+    /* Transições suaves */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
 
