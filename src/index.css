@@ -9,33 +9,35 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 201 100% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 201 100% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 201 100% 10%;
 
-    /* Primary - Verde vibrante do Click Serviços */
-    --primary: 142 71% 45%;
+    /* Primary - Verde Esmeralda #00C389 */
+    --primary: 162 100% 38%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 142 71% 40%;
+    --primary-hover: 162 100% 33%;
+
+    /* Navy - Azul Escuro #011B33 */
+    --navy: 201 100% 10%;
+    --navy-light: 201 95% 15%;
 
     /* Secondary - Verde mais claro */
-    --secondary: 142 71% 90%;
-    --secondary-foreground: 142 71% 20%;
+    --secondary: 162 100% 85%;
+    --secondary-foreground: 162 100% 15%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 142 71% 45%;
+    --accent: 162 100% 38%;
     --accent-foreground: 0 0% 100%;
 
-    /* Cores adicionais do Click Serviços */
-    --navy: 222 84% 15%;
-    --navy-light: 222 84% 25%;
-    --success: 142 71% 45%;
+    /* Cores específicas Click Serviços */
+    --success: 162 100% 38%;
     --warning: 45 93% 58%;
 
     --destructive: 0 84.2% 60.2%;
@@ -43,23 +45,26 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 142 71% 45%;
+    --ring: 162 100% 38%;
 
-    /* Gradientes */
+    /* Gradientes premium */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
-    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(142 71% 97%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(162 100% 97%) 100%);
     --gradient-navy: linear-gradient(135deg, hsl(var(--navy)) 0%, hsl(var(--navy-light)) 100%);
+    --gradient-emerald: linear-gradient(135deg, hsl(162 100% 38%) 0%, hsl(162 100% 45%) 100%);
 
-    /* Sombras */
-    --shadow-soft: 0 4px 6px -1px hsl(var(--primary) / 0.1), 0 2px 4px -1px hsl(var(--primary) / 0.06);
-    --shadow-medium: 0 10px 15px -3px hsl(var(--primary) / 0.1), 0 4px 6px -2px hsl(var(--primary) / 0.05);
-    --shadow-large: 0 25px 50px -12px hsl(var(--primary) / 0.25);
+    /* Sombras premium */
+    --shadow-soft: 0 1px 3px 0 rgba(0, 195, 137, 0.1), 0 1px 2px 0 rgba(0, 195, 137, 0.06);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 195, 137, 0.1), 0 2px 4px -1px rgba(0, 195, 137, 0.06);
+    --shadow-large: 0 20px 25px -5px rgba(0, 195, 137, 0.1), 0 10px 10px -5px rgba(0, 195, 137, 0.04);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 195, 137, 0.25);
 
-    /* Transições suaves */
+    /* Animações liquid */
+    --transition-liquid: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
-    --radius: 1rem;
+    --radius: 1.5rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -124,5 +129,36 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Utilitárias premium para micro-interações */
+@layer components {
+  .btn-liquid {
+    @apply transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:scale-105;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
+  }
+  
+  .glass-effect {
+    @apply backdrop-blur-xl bg-white/10 border border-white/20;
+  }
+  
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent;
+  }
+  
+  .glow-primary {
+    box-shadow: 0 0 20px rgba(0, 195, 137, 0.3);
+  }
+  
+  .section-padding {
+    @apply py-24 lg:py-32;
+  }
+  
+  .container-custom {
+    @apply container mx-auto px-4 lg:px-8 max-w-7xl;
   }
 }

@@ -24,79 +24,65 @@ export const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-liquid ${
         isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-soft"
+          ? "glass-effect shadow-xl"
           : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+      <div className="container-custom">
+        <div className="flex items-center justify-between h-20 lg:h-24">
           {/* Logo */}
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Skull className="w-5 h-5 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="w-12 h-12 bg-gradient-emerald rounded-2xl flex items-center justify-center shadow-medium">
+              <Skull className="w-7 h-7 text-white" />
             </div>
-            <span className="text-xl font-bold text-foreground">
+            <span className="text-2xl font-black text-foreground tracking-tight">
               Click Serviços
             </span>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            <button
-              onClick={() => scrollToSection("inicio")}
-              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Início
-            </button>
-            <button
-              onClick={() => scrollToSection("sobre")}
-              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Sobre
-            </button>
-            <button
-              onClick={() => scrollToSection("como-funciona")}
-              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Como funciona
-            </button>
-            <button
-              onClick={() => scrollToSection("seja-profissional")}
-              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Seja um Profissional
-            </button>
-            <button
-              onClick={() => scrollToSection("contato")}
-              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Contato
-            </button>
+            {["inicio", "sobre", "como-funciona", "seja-profissional", "contato"].map((section) => (
+              <button
+                key={section}
+                onClick={() => scrollToSection(section)}
+                className="relative text-foreground hover:text-primary transition-all duration-300 font-medium text-lg group"
+              >
+                {section === "inicio" && "Início"}
+                {section === "sobre" && "Sobre"}
+                {section === "como-funciona" && "Como funciona"}
+                {section === "seja-profissional" && "Seja um Pro"}
+                {section === "contato" && "Contato"}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-emerald transition-all duration-300 group-hover:w-full"></span>
+              </button>
+            ))}
           </nav>
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
             <Button
               variant="outline"
+              size="lg"
+              className="border-2 border-primary/20 hover:border-primary hover:bg-primary/5 btn-liquid"
               onClick={() => scrollToSection("contratar")}
-              className="hover:border-primary hover:text-primary"
             >
               Quero contratar
             </Button>
             <Button
               variant="hero"
               size="lg"
+              className="btn-liquid glow-primary"
               onClick={() => scrollToSection("seja-profissional")}
             >
-              Me tornar profissional
+              Me tornar Pro
             </Button>
           </div>
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden p-2"
+            className="lg:hidden p-3 rounded-xl hover:bg-primary/10 transition-colors duration-300"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
@@ -109,42 +95,26 @@ export const Header = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden absolute top-full left-0 right-0 bg-white shadow-large rounded-b-2xl p-6 space-y-4">
-            <button
-              onClick={() => scrollToSection("inicio")}
-              className="block w-full text-left py-2 text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Início
-            </button>
-            <button
-              onClick={() => scrollToSection("sobre")}
-              className="block w-full text-left py-2 text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Sobre
-            </button>
-            <button
-              onClick={() => scrollToSection("como-funciona")}
-              className="block w-full text-left py-2 text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Como funciona
-            </button>
-            <button
-              onClick={() => scrollToSection("seja-profissional")}
-              className="block w-full text-left py-2 text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Seja um Profissional
-            </button>
-            <button
-              onClick={() => scrollToSection("contato")}
-              className="block w-full text-left py-2 text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Contato
-            </button>
-            <div className="flex flex-col space-y-3 pt-4 border-t">
+          <div className="lg:hidden absolute top-full left-0 right-0 glass-effect shadow-xl rounded-b-3xl p-8 space-y-6 animate-in slide-in-from-top duration-300">
+            {["inicio", "sobre", "como-funciona", "seja-profissional", "contato"].map((section) => (
+              <button
+                key={section}
+                onClick={() => scrollToSection(section)}
+                className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors duration-300 font-medium text-lg"
+              >
+                {section === "inicio" && "Início"}
+                {section === "sobre" && "Sobre"}
+                {section === "como-funciona" && "Como funciona"}
+                {section === "seja-profissional" && "Seja um Pro"}
+                {section === "contato" && "Contato"}
+              </button>
+            ))}
+            <div className="flex flex-col space-y-4 pt-6 border-t border-primary/10">
               <Button
                 variant="outline"
+                size="lg"
                 onClick={() => scrollToSection("contratar")}
-                className="w-full"
+                className="w-full border-2 border-primary/20 hover:border-primary"
               >
                 Quero contratar
               </Button>
@@ -152,9 +122,9 @@ export const Header = () => {
                 variant="hero"
                 size="lg"
                 onClick={() => scrollToSection("seja-profissional")}
-                className="w-full"
+                className="w-full glow-primary"
               >
-                Me tornar profissional
+                Me tornar Pro
               </Button>
             </div>
           </div>
