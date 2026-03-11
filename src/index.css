@@ -128,7 +128,8 @@ All colors MUST be HSL.
 /* Utilitárias premium para micro-interações */
 @layer components {
   .btn-liquid {
-    @apply transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:scale-105;
+    @apply transition-all duration-500 transform hover:scale-105;
+    transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
   }
 
   .hover-lift {
