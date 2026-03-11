@@ -37,7 +37,7 @@ export const AboutSection = () => {
             <Star className="w-5 h-5 fill-current" />
             <span>Sobre a Plataforma</span>
           </div>
-          
+
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-8 leading-tight">
             Conectamos{" "}
             <span className="text-gradient-primary relative">
@@ -50,7 +50,7 @@ export const AboutSection = () => {
               <div className="absolute -bottom-2 left-0 right-0 h-4 bg-gradient-emerald opacity-20 rounded-full transform rotate-1"></div>
             </span>
           </h2>
-          
+
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light">
             A Click Serviços revoluciona a forma como você encontra profissionais qualificados.
             <br className="hidden md:block" />
@@ -60,23 +60,20 @@ export const AboutSection = () => {
 
         {/* Three Principles */}
         <div className="grid md:grid-cols-3 gap-8 mb-24">
-          {principles.map((principle, index) => (
+          {principles.map((principle) => (
             <div
               key={principle.title}
               className="group hover-lift"
             >
               <div className="relative bg-white rounded-3xl p-8 shadow-soft border border-primary/5 overflow-hidden">
-                {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${principle.color} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}></div>
-                
-                {/* Icon */}
+
                 <div className="relative z-10 mb-6">
                   <div className={`w-16 h-16 bg-gradient-to-br ${principle.color} rounded-2xl flex items-center justify-center shadow-medium group-hover:shadow-large group-hover:scale-110 transition-all duration-500`}>
                     <principle.icon className="w-8 h-8 text-white" />
                   </div>
                 </div>
-                
-                {/* Content */}
+
                 <div className="relative z-10">
                   <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300">
                     {principle.title}
@@ -86,7 +83,6 @@ export const AboutSection = () => {
                   </p>
                 </div>
 
-                {/* Animated border */}
                 <div className="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-primary/20 transition-all duration-500"></div>
               </div>
             </div>
@@ -103,7 +99,7 @@ export const AboutSection = () => {
               <div className="text-lg font-semibold text-foreground mb-1">Profissionais</div>
               <div className="text-sm text-muted-foreground">Verificados ativamente</div>
             </div>
-            
+
             <div className="group">
               <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
                 150K+
@@ -111,7 +107,7 @@ export const AboutSection = () => {
               <div className="text-lg font-semibold text-foreground mb-1">Serviços</div>
               <div className="text-sm text-muted-foreground">Realizados com sucesso</div>
             </div>
-            
+
             <div className="group">
               <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
                 4.9★
@@ -119,7 +115,7 @@ export const AboutSection = () => {
               <div className="text-lg font-semibold text-foreground mb-1">Avaliação</div>
               <div className="text-sm text-muted-foreground">Média da plataforma</div>
             </div>
-            
+
             <div className="group">
               <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
                 99%
@@ -136,7 +132,7 @@ export const AboutSection = () => {
             <h3 className="text-3xl font-bold text-foreground">
               Por que somos diferentes?
             </h3>
-            
+
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
@@ -147,7 +143,7 @@ export const AboutSection = () => {
                   <p className="text-muted-foreground">Background check, validação de habilidades e teste prático para cada profissional.</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <CheckCircle className="w-5 h-5 text-primary" />
@@ -157,7 +153,7 @@ export const AboutSection = () => {
                   <p className="text-muted-foreground">IA que conecta você com o profissional ideal baseado em localização, especialidade e disponibilidade.</p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-4">
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <CheckCircle className="w-5 h-5 text-primary" />
@@ -182,7 +178,7 @@ export const AboutSection = () => {
                     <div className="text-sm text-muted-foreground">3 profissionais disponíveis agora</div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-2xl">
                     <div className="w-10 h-10 bg-primary rounded-xl"></div>
@@ -195,7 +191,7 @@ export const AboutSection = () => {
                       <div className="text-xs text-muted-foreground">Visita</div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3 p-3 rounded-2xl border border-primary/10">
                     <div className="w-10 h-10 bg-muted rounded-xl"></div>
                     <div className="flex-1">
@@ -208,7 +204,7 @@ export const AboutSection = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <button className="w-full bg-gradient-emerald text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 group">
                   Contratar João Silva
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />

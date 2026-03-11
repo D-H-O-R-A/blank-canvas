@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
 
@@ -67,19 +67,12 @@ All colors MUST be HSL.
     --radius: 1.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -137,27 +130,27 @@ All colors MUST be HSL.
   .btn-liquid {
     @apply transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] transform hover:scale-105;
   }
-  
+
   .hover-lift {
     @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
   }
-  
+
   .glass-effect {
     @apply backdrop-blur-xl bg-white/10 border border-white/20;
   }
-  
+
   .text-gradient-primary {
     @apply bg-gradient-to-r from-primary to-primary-hover bg-clip-text text-transparent;
   }
-  
+
   .glow-primary {
     box-shadow: 0 0 20px rgba(0, 195, 137, 0.3);
   }
-  
+
   .section-padding {
     @apply py-24 lg:py-32;
   }
-  
+
   .container-custom {
     @apply container mx-auto px-4 lg:px-8 max-w-7xl;
   }

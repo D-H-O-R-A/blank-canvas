@@ -41,13 +41,13 @@ export const TestimonialsSection = () => {
             <Star className="w-4 h-4 fill-current" />
             <span>Depoimentos</span>
           </div>
-          
+
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             O que nossos{" "}
             <span className="text-primary">clientes e profissionais</span>{" "}
             estão dizendo
           </h2>
-          
+
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
             Mais de 50.000 pessoas já transformaram a forma como contratam e prestam serviços.
           </p>
@@ -55,7 +55,7 @@ export const TestimonialsSection = () => {
 
         {/* Testimonials Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-          {testimonials.map((testimonial, index) => (
+          {testimonials.map((testimonial) => (
             <div
               key={testimonial.name}
               className="bg-white rounded-2xl p-6 shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-2"

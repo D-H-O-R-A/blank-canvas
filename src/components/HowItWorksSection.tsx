@@ -37,14 +37,14 @@ export const HowItWorksSection = () => {
             <Calendar className="w-4 h-4" />
             <span>Como Funciona</span>
           </div>
-          
+
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             Serviços de qualidade em{" "}
             <span className="text-primary">4 passos simples</span>
           </h2>
-          
+
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Nossa plataforma foi projetada para ser intuitiva e eficiente. 
+            Nossa plataforma foi projetada para ser intuitiva e eficiente.
             Veja como é fácil encontrar o profissional ideal.
           </p>
         </div>
@@ -60,18 +60,18 @@ export const HowItWorksSection = () => {
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-16 left-[calc(100%-2rem)] w-8 h-0.5 bg-gradient-to-r from-primary to-primary/30 z-10"></div>
               )}
-              
+
               <div className="bg-white rounded-2xl p-6 text-center shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-2 relative z-20">
                 {/* Step Number */}
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
                   {index + 1}
                 </div>
-                
+
                 {/* Icon */}
                 <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
                   <step.icon className="w-8 h-8" />
                 </div>
-                
+
                 {/* Content */}
                 <h3 className="font-semibold text-foreground mb-2 text-lg">
                   {step.title}
@@ -96,7 +96,7 @@ export const HowItWorksSection = () => {
                   Pronto para começar?
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  Junte-se a milhares de usuários que já descobriram a facilidade 
+                  Junte-se a milhares de usuários que já descobriram a facilidade
                   de encontrar profissionais qualificados.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -108,12 +108,12 @@ export const HowItWorksSection = () => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="relative">
                 <div className="w-64 h-64 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center">
                   <div className="text-6xl">📱</div>
                 </div>
-                
+
                 {/* Floating elements */}
                 <div className="absolute top-4 right-4 bg-success text-white px-3 py-1 rounded-full text-xs font-medium">
                   Online

@@ -14,7 +14,6 @@ export const Footer = () => {
     e.preventDefault();
     console.log("Newsletter signup:", email);
     setEmail("");
-    // Implementar integração com newsletter
   };
 
   return (
@@ -36,7 +35,7 @@ export const Footer = () => {
                 <span className="text-2xl font-bold">Click Serviços</span>
               </div>
               <p className="text-white/70 mb-6 leading-relaxed">
-                Conectando pessoas que precisam com profissionais que fazem acontecer. 
+                Conectando pessoas que precisam com profissionais que fazem acontecer.
                 O futuro dos serviços está aqui.
               </p>
               <div className="flex gap-4">

@@ -35,14 +35,14 @@ export const HeroSection = () => {
           }}
         />
         <div
-          className="absolute bottom-20 left-20 w-80 h-80 bg-primary/8 rounded-full blur-3xl animate-pulse"
+          className="absolute bottom-20 left-20 w-80 h-80 bg-primary/[0.08] rounded-full blur-3xl animate-pulse"
           style={{
             animationDelay: "1s",
             transform: `translate(${mousePosition.x * -0.01}px, ${mousePosition.y * -0.01}px)`,
           }}
         />
         <div
-          className="absolute top-1/2 left-1/2 w-64 h-64 bg-primary/3 rounded-full blur-3xl animate-pulse"
+          className="absolute top-1/2 left-1/2 w-64 h-64 bg-primary/[0.03] rounded-full blur-3xl animate-pulse"
           style={{
             animationDelay: "2s",
             transform: `translate(-50%, -50%) translate(${mousePosition.x * 0.03}px, ${mousePosition.y * 0.03}px)`,
@@ -75,7 +75,7 @@ export const HeroSection = () => {
                 </span>{" "}
                 da sua mão.
               </h1>
-              
+
               <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light max-w-2xl">
                 Encontre e contrate em segundos com a{" "}
                 <span className="font-semibold text-primary">Click Serviços</span>.
@@ -94,7 +94,7 @@ export const HeroSection = () => {
                   <div className="text-xs text-muted-foreground">Verificados</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                   <Zap className="w-5 h-5 text-primary" />
@@ -104,7 +104,7 @@ export const HeroSection = () => {
                   <div className="text-xs text-muted-foreground">Em segundos</div>
                 </div>
               </div>
-              
+
               <div className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift">
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                   <CheckCircle className="w-5 h-5 text-primary" />
@@ -130,7 +130,7 @@ export const HeroSection = () => {
                 Quero Contratar
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
               </Button>
-              
+
               <Button
                 variant="outline"
                 size="xl"
@@ -196,17 +196,17 @@ export const HeroSection = () => {
                         </div>
                         <div className="w-8 h-8 bg-primary/10 rounded-full"></div>
                       </div>
-                      
+
                       <div className="space-y-4">
                         <div className="h-4 bg-primary/20 rounded-full w-3/4"></div>
                         <div className="h-4 bg-primary/15 rounded-full w-1/2"></div>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-4">
                         <div className="aspect-square bg-primary/10 rounded-2xl"></div>
                         <div className="aspect-square bg-primary/15 rounded-2xl"></div>
                       </div>
-                      
+
                       <div className="bg-gradient-emerald rounded-2xl p-4 text-white">
                         <div className="text-sm font-semibold">João está a caminho!</div>
                         <div className="text-xs opacity-90">Chegada em 8 minutos</div>

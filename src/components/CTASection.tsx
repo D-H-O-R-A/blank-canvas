@@ -27,7 +27,7 @@ export const CTASection = () => {
           </h2>
 
           <p className="text-xl md:text-2xl text-muted-foreground mb-12 leading-relaxed max-w-3xl mx-auto">
-            Junte-se à revolução que está transformando a forma como pessoas 
+            Junte-se à revolução que está transformando a forma como pessoas
             encontram e prestam serviços no Brasil.
           </p>
 
@@ -45,9 +45,9 @@ export const CTASection = () => {
               Contratar um serviço
               <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
             </Button>
-            
+
             <Button
-              variant="outline-white"
+              variant="outline"
               size="xl"
               className="text-lg px-12 py-6 h-auto border-2 border-primary text-primary hover:bg-primary hover:text-white"
               onClick={() => {

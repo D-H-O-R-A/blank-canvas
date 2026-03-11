@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, Shield, CreditCard, Zap, TrendingUp, Users, Award, CheckCircle, X, ArrowRight } from "lucide-react";
+import { Star, Shield, CreditCard, Zap, TrendingUp, Users, Award, CheckCircle, ArrowRight } from "lucide-react";
 
 export const ProfessionalSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,8 +46,8 @@ export const ProfessionalSection = () => {
       duration: "1 mês",
       price: "R$ 20",
       period: "/mês",
-      badge: null,
-      savings: null,
+      badge: null as string | null,
+      savings: null as string | null,
       features: ["Perfil básico", "5 propostas/mês", "Suporte por email", "Badge verificado"]
     },
     {
@@ -71,9 +71,7 @@ export const ProfessionalSection = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Formulário enviado:", formData);
-    // Aqui seria a integração com Mercado Pago
     setIsModalOpen(false);
-    // Simular redirecionamento para pagamento
     alert("Redirecionando para pagamento...");
   };
 
@@ -92,7 +90,7 @@ export const ProfessionalSection = () => {
             <Award className="w-5 h-5" />
             <span>Seja um Profissional Elite</span>
           </div>
-          
+
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-8 leading-tight">
             Transforme seu talento em{" "}
             <span className="text-gradient-primary relative">
@@ -100,7 +98,7 @@ export const ProfessionalSection = () => {
               <div className="absolute -bottom-3 left-0 right-0 h-6 bg-gradient-emerald opacity-20 rounded-full transform rotate-1"></div>
             </span>
           </h2>
-          
+
           <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light mb-12">
             Junte-se à elite dos prestadores de serviço. Clientes premium,
             <br className="hidden md:block" />
@@ -118,7 +116,7 @@ export const ProfessionalSection = () => {
                 <Star className="w-6 h-6 ml-2" />
               </Button>
             </DialogTrigger>
-            
+
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <div className="flex items-center justify-between">
@@ -196,7 +194,7 @@ export const ProfessionalSection = () => {
                 <div className="space-y-4">
                   <Label>Escolha seu plano</Label>
                   <div className="grid gap-4">
-                    {plans.map((plan, index) => (
+                    {plans.map((plan) => (
                       <div
                         key={plan.duration}
                         className={`relative border-2 rounded-2xl p-4 cursor-pointer transition-all duration-300 ${
@@ -211,7 +209,7 @@ export const ProfessionalSection = () => {
                             {plan.badge}
                           </Badge>
                         )}
-                        
+
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -221,7 +219,7 @@ export const ProfessionalSection = () => {
                                 <div className="w-2 h-2 bg-white rounded-full"></div>
                               )}
                             </div>
-                            
+
                             <div>
                               <div className="flex items-center gap-3">
                                 <h4 className="font-bold text-foreground">{plan.duration}</h4>
@@ -237,14 +235,14 @@ export const ProfessionalSection = () => {
                               </div>
                             </div>
                           </div>
-                          
+
                           <div className="text-right">
                             <div className="text-xs text-muted-foreground mb-1">
                               {plan.features.length} recursos
                             </div>
                           </div>
                         </div>
-                        
+
                         <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                           {plan.features.slice(0, 4).map((feature, idx) => (
                             <div key={idx} className="flex items-center gap-1">
@@ -265,8 +263,8 @@ export const ProfessionalSection = () => {
                     <button
                       type="button"
                       className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
-                        formData.paymentMethod === "pix" 
-                          ? "border-primary bg-primary/5" 
+                        formData.paymentMethod === "pix"
+                          ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/50"
                       }`}
                       onClick={() => setFormData({ ...formData, paymentMethod: "pix" })}
@@ -277,12 +275,12 @@ export const ProfessionalSection = () => {
                         <div className="text-xs text-muted-foreground">Aprovação instantânea</div>
                       </div>
                     </button>
-                    
+
                     <button
                       type="button"
                       className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
-                        formData.paymentMethod === "cartao" 
-                          ? "border-primary bg-primary/5" 
+                        formData.paymentMethod === "cartao"
+                          ? "border-primary bg-primary/5"
                           : "border-border hover:border-primary/50"
                       }`}
                       onClick={() => setFormData({ ...formData, paymentMethod: "cartao" })}
@@ -319,7 +317,7 @@ export const ProfessionalSection = () => {
 
         {/* Benefits Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-20">
-          {benefits.map((benefit, index) => (
+          {benefits.map((benefit) => (
             <div
               key={benefit.title}
               className="bg-white rounded-3xl p-8 shadow-soft hover:shadow-xl hover-lift border border-primary/5"
