@@ -30,11 +30,11 @@ export const HowItWorksSection = () => {
   ];
 
   return (
-    <section id="como-funciona" className="py-20 lg:py-32 bg-muted/30">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section id="como-funciona" className="section-padding bg-muted/30">
+      <div className="container-custom">
         {/* Header */}
         <motion.div
-          className="text-center max-w-3xl mx-auto mb-16 lg:mb-20"
+          className="text-center max-w-3xl mx-auto mb-10 lg:mb-20"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -45,19 +45,19 @@ export const HowItWorksSection = () => {
             <span>Como Funciona</span>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 lg:mb-6">
             Serviços de qualidade em{" "}
             <span className="text-primary">4 passos simples</span>
           </h2>
 
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-xl text-muted-foreground leading-relaxed">
             Nossa plataforma foi projetada para ser intuitiva e eficiente.
             Veja como é fácil encontrar o profissional ideal.
           </p>
         </motion.div>
 
         {/* Steps Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-6">
           {steps.map((step, index) => (
             <motion.div
               key={step.title}
@@ -73,7 +73,7 @@ export const HowItWorksSection = () => {
               )}
 
               <motion.div
-                className="bg-white rounded-2xl p-6 text-center shadow-soft hover:shadow-medium transition-all duration-300 relative z-20"
+                className="bg-white rounded-2xl p-5 lg:p-6 text-center shadow-soft hover:shadow-medium transition-all duration-300 relative z-20"
                 whileHover={{ y: -8, scale: 1.02 }}
               >
                 {/* Step Number */}
@@ -82,18 +82,18 @@ export const HowItWorksSection = () => {
                 </div>
 
                 {/* Icon */}
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
-                  <step.icon className="w-8 h-8" />
+                <div className="w-14 h-14 lg:w-16 lg:h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                  <step.icon className="w-7 h-7 lg:w-8 lg:h-8" />
                 </div>
 
                 {/* Content */}
-                <h3 className="font-semibold text-foreground mb-2 text-lg">
+                <h3 className="font-semibold text-foreground mb-2 text-base lg:text-lg">
                   {step.title}
                 </h3>
-                <p className="text-muted-foreground mb-3">
+                <p className="text-muted-foreground mb-3 text-sm">
                   {step.description}
                 </p>
-                <p className="text-sm text-primary font-medium">
+                <p className="text-xs lg:text-sm text-primary font-medium">
                   {step.details}
                 </p>
               </motion.div>
@@ -103,32 +103,32 @@ export const HowItWorksSection = () => {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-16"
+          className="text-center mt-12 lg:mt-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-white rounded-3xl p-8 md:p-12 shadow-soft max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-12 shadow-soft max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8 items-center">
               <div className="text-left">
-                <h3 className="text-2xl font-bold text-foreground mb-4">
+                <h3 className="text-xl lg:text-2xl font-bold text-foreground mb-3 lg:mb-4">
                   Pronto para começar?
                 </h3>
-                <p className="text-muted-foreground mb-6">
+                <p className="text-sm lg:text-base text-muted-foreground mb-4 lg:mb-6">
                   Junte-se a milhares de usuários que já descobriram a facilidade
                   de encontrar profissionais qualificados.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
                   <motion.button
-                    className="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-hover transition-colors duration-300"
+                    className="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-hover transition-colors duration-300 text-sm lg:text-base"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     Começar agora
                   </motion.button>
                   <motion.button
-                    className="border border-border px-6 py-3 rounded-xl font-medium hover:border-primary hover:text-primary transition-colors duration-300"
+                    className="border border-border px-6 py-3 rounded-xl font-medium hover:border-primary hover:text-primary transition-colors duration-300 text-sm lg:text-base"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -137,8 +137,8 @@ export const HowItWorksSection = () => {
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="w-64 h-64 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center overflow-hidden">
+              <div className="relative hidden sm:block">
+                <div className="w-48 h-48 lg:w-64 lg:h-64 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center overflow-hidden">
                   <img
                     src="/lovable-uploads/cel.png"
                     alt="App Click Serviços"
