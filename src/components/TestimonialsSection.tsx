@@ -38,10 +38,10 @@ export const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-20 lg:py-32 bg-muted/30">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section className="section-padding bg-muted/30">
+      <div className="container-custom">
         <motion.div
-          className="text-center max-w-3xl mx-auto mb-16 lg:mb-20"
+          className="text-center max-w-3xl mx-auto mb-10 lg:mb-20"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -52,22 +52,22 @@ export const TestimonialsSection = () => {
             <span>Depoimentos</span>
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 lg:mb-6">
             O que nossos{" "}
             <span className="text-primary">testadores e profissionais</span>{" "}
             estão dizendo
           </h2>
 
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-xl text-muted-foreground leading-relaxed">
             Pessoas que já testaram a plataforma e profissionais pré-cadastrados compartilham suas impressões.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-10 lg:mb-16">
           {testimonials.map((testimonial, i) => (
             <motion.div
               key={testimonial.name}
-              className="bg-white rounded-2xl p-6 shadow-soft hover:shadow-medium transition-all duration-300"
+              className="bg-white rounded-2xl p-5 lg:p-6 shadow-soft hover:shadow-medium transition-all duration-300"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -100,13 +100,13 @@ export const TestimonialsSection = () => {
         </div>
 
         <motion.div
-          className="bg-white rounded-3xl p-8 md:p-12 shadow-soft"
+          className="bg-white rounded-2xl lg:rounded-3xl p-6 lg:p-12 shadow-soft"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <div className="grid md:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8 text-center">
             {[
               { stat: "4.9/5", label: "Avaliação dos testadores", showStars: true },
               { stat: "+1k", label: "Profissionais pré-cadastrados" },
@@ -114,12 +114,12 @@ export const TestimonialsSection = () => {
               { stat: "99%", label: "Aprovação nos testes" },
             ].map((item, i) => (
               <motion.div key={i} whileHover={{ scale: 1.05 }}>
-                <div className="text-3xl lg:text-4xl font-bold text-primary mb-2">{item.stat}</div>
-                <div className="text-sm text-muted-foreground">{item.label}</div>
+                <div className="text-2xl lg:text-4xl font-bold text-primary mb-2">{item.stat}</div>
+                <div className="text-xs lg:text-sm text-muted-foreground">{item.label}</div>
                 {item.showStars && (
                   <div className="flex justify-center gap-1 mt-2">
                     {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="w-4 h-4 text-yellow-400 fill-current" />
+                      <Star key={j} className="w-3 h-3 lg:w-4 lg:h-4 text-yellow-400 fill-current" />
                     ))}
                   </div>
                 )}

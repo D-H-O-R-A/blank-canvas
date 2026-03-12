@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Star, Shield, Zap, Play, MapPin, Clock } from "lucide-react";
-import likesPeople from "@/assets/likes-people.png";
+import person1 from "@/assets/review-person-1.jpg";
+import person2 from "@/assets/review-person-2.jpg";
+import person3 from "@/assets/review-person-3.jpg";
 
 export const HeroSection = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -45,41 +47,41 @@ export const HeroSection = () => {
         />
       </div>
 
-      <div className="container-custom section-padding relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center min-h-[90vh]">
+      <div className="container-custom pt-28 pb-16 lg:section-padding relative z-10">
+        <div className="grid lg:grid-cols-2 gap-10 lg:gap-20 items-center min-h-[80vh] lg:min-h-[90vh]">
           {/* Left Column */}
           <motion.div
-            className="space-y-8 lg:space-y-12"
+            className="space-y-6 lg:space-y-12"
             initial={{ opacity: 0, x: -40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <motion.div
-              className="inline-flex items-center gap-3 glass-effect text-primary px-6 py-3 rounded-2xl text-sm font-semibold"
+              className="inline-flex items-center gap-2 lg:gap-3 glass-effect text-primary px-4 lg:px-6 py-2 lg:py-3 rounded-2xl text-xs lg:text-sm font-semibold"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
               <div className="relative">
-                <Star className="w-5 h-5 fill-current" />
+                <Star className="w-4 h-4 lg:w-5 lg:h-5 fill-current" />
                 <div className="absolute inset-0 animate-ping">
-                  <Star className="w-5 h-5 fill-current opacity-30" />
+                  <Star className="w-4 h-4 lg:w-5 lg:h-5 fill-current opacity-30" />
                 </div>
               </div>
               <span>Plataforma #1 em Serviços Premium</span>
             </motion.div>
 
-            <div className="space-y-6">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-black text-foreground leading-[0.9] tracking-tight">
+            <div className="space-y-4 lg:space-y-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-foreground leading-[0.95] tracking-tight">
                 O profissional certo,{" "}
                 <span className="text-gradient-primary relative">
                   na palma
-                  <div className="absolute -bottom-3 left-0 right-0 h-6 bg-gradient-emerald opacity-20 rounded-full transform rotate-1"></div>
+                  <div className="absolute -bottom-2 lg:-bottom-3 left-0 right-0 h-4 lg:h-6 bg-gradient-emerald opacity-20 rounded-full transform rotate-1"></div>
                 </span>{" "}
                 da sua mão.
               </h1>
 
-              <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light max-w-2xl">
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed font-light max-w-2xl">
                 Encontre e contrate em segundos com a{" "}
                 <span className="font-semibold text-primary">Click Serviços</span>.
                 A revolução que você estava esperando.
@@ -87,7 +89,7 @@ export const HeroSection = () => {
             </div>
 
             {/* Trust Indicators */}
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 gap-3 lg:gap-6">
               {[
                 { icon: Shield, title: "100% Seguro", sub: "Verificados" },
                 { icon: Zap, title: "Instantâneo", sub: "Em segundos" },
@@ -95,35 +97,35 @@ export const HeroSection = () => {
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
-                  className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift cursor-pointer"
+                  className="flex items-center gap-2 lg:gap-3 p-2 sm:p-3 lg:p-4 bg-white/50 backdrop-blur-sm rounded-xl lg:rounded-2xl hover-lift cursor-pointer"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
                 >
-                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                    <item.icon className="w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 lg:w-10 lg:h-10 bg-primary/10 rounded-lg lg:rounded-xl flex items-center justify-center flex-shrink-0">
+                    <item.icon className="w-4 h-4 lg:w-5 lg:h-5 text-primary" />
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-foreground">{item.title}</div>
-                    <div className="text-xs text-muted-foreground">{item.sub}</div>
+                    <div className="text-xs lg:text-sm font-bold text-foreground">{item.title}</div>
+                    <div className="text-[10px] lg:text-xs text-muted-foreground">{item.sub}</div>
                   </div>
                 </motion.div>
               ))}
             </div>
 
             {/* CTA */}
-            <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
                 <Button
                   variant="hero"
                   size="xl"
-                  className="group text-lg px-12 py-6 h-auto btn-liquid glow-primary"
+                  className="group text-base lg:text-lg px-8 lg:px-12 py-5 lg:py-6 h-auto btn-liquid glow-primary w-full sm:w-auto"
                   onClick={() => document.getElementById("sobre")?.scrollIntoView({ behavior: "smooth" })}
                 >
                   Quero Contratar
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
+                  <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 group-hover:translate-x-1 transition-transform duration-300" />
                 </Button>
               </motion.div>
 
@@ -131,7 +133,7 @@ export const HeroSection = () => {
                 <Button
                   variant="outline"
                   size="xl"
-                  className="text-lg px-12 py-6 h-auto btn-liquid border-2 border-primary/20 hover:border-primary hover:bg-primary/5"
+                  className="text-base lg:text-lg px-8 lg:px-12 py-5 lg:py-6 h-auto btn-liquid border-2 border-primary/20 hover:border-primary hover:bg-primary/5 w-full sm:w-auto"
                   onClick={() => document.getElementById("seja-profissional")?.scrollIntoView({ behavior: "smooth" })}
                 >
                   Sou Profissional
@@ -140,25 +142,25 @@ export const HeroSection = () => {
             </div>
 
             {/* Social Proof */}
-            <div className="flex items-center gap-8 pt-8 border-t border-primary/10">
+            <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 pt-6 lg:pt-8 border-t border-primary/10">
               <div className="text-center">
-                <div className="text-3xl font-black text-primary">+1k</div>
-                <div className="text-sm text-muted-foreground">Pro pré-cadastrado</div>
+                <div className="text-2xl lg:text-3xl font-black text-primary">+1k</div>
+                <div className="text-xs lg:text-sm text-muted-foreground">Pro pré-cadastrado</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-black text-primary">+150</div>
-                <div className="text-sm text-muted-foreground">Tipos de serviços</div>
+                <div className="text-2xl lg:text-3xl font-black text-primary">+150</div>
+                <div className="text-xs lg:text-sm text-muted-foreground">Tipos de serviços</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-black text-primary">4.9★</div>
-                <div className="text-sm text-muted-foreground">Avaliação dos testadores</div>
+                <div className="text-2xl lg:text-3xl font-black text-primary">4.9★</div>
+                <div className="text-xs lg:text-sm text-muted-foreground">Avaliação dos testadores</div>
               </div>
             </div>
           </motion.div>
 
-          {/* Right Column - Phone Mockup */}
+          {/* Right Column - Phone Mockup (hidden on mobile) */}
           <motion.div
-            className="relative"
+            className="relative hidden md:block"
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -240,15 +242,19 @@ export const HeroSection = () => {
                   </div>
                 </motion.div>
 
-                {/* Floating: Likes */}
+                {/* Floating: Likes with 3 avatars */}
                 <motion.div
                   className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-large"
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 1.2, duration: 0.5 }}
                 >
-                  <div className="flex items-center gap-2">
-                    <img src={likesPeople} alt="Pessoas felizes" className="w-12 h-12 object-contain" />
+                  <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                      <img src={person1} alt="Pessoa 1" className="w-8 h-8 rounded-full object-cover border-2 border-white" />
+                      <img src={person2} alt="Pessoa 2" className="w-8 h-8 rounded-full object-cover border-2 border-white" />
+                      <img src={person3} alt="Pessoa 3" className="w-8 h-8 rounded-full object-cover border-2 border-white" />
+                    </div>
                     <div className="text-sm font-medium">+5K Likes</div>
                   </div>
                 </motion.div>

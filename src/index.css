@@ -149,7 +149,7 @@ All colors MUST be HSL.
   }
 
   .section-padding {
-    @apply py-24 lg:py-32;
+    @apply py-16 lg:py-32;
   }
 
   .container-custom {
