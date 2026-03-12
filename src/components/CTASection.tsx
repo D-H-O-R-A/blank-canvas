@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
+import emojiLightbulb from "@/assets/emoji-lightbulb.png";
+import emojiShield from "@/assets/emoji-shield.png";
+import emojiRocket from "@/assets/emoji-rocket.png";
 
 export const CTASection = () => {
   return (
@@ -41,10 +44,7 @@ export const CTASection = () => {
                 variant="hero"
                 size="xl"
                 className="group text-lg px-12 py-6 h-auto"
-                onClick={() => {
-                  const element = document.getElementById("como-funciona");
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
+                onClick={() => document.getElementById("como-funciona")?.scrollIntoView({ behavior: "smooth" })}
               >
                 Contratar um serviço
                 <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
@@ -56,10 +56,7 @@ export const CTASection = () => {
                 variant="outline"
                 size="xl"
                 className="text-lg px-12 py-6 h-auto border-2 border-primary text-primary hover:bg-primary hover:text-white"
-                onClick={() => {
-                  const element = document.getElementById("seja-profissional");
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
+                onClick={() => document.getElementById("seja-profissional")?.scrollIntoView({ behavior: "smooth" })}
               >
                 Seja um prestador
               </Button>
@@ -68,9 +65,9 @@ export const CTASection = () => {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
-              { emoji: "💡", title: "Inovação constante", desc: "Sempre evoluindo para oferecer a melhor experiência" },
-              { emoji: "🛡️", title: "Segurança garantida", desc: "Proteção total em todas as transações e serviços" },
-              { emoji: "🚀", title: "Crescimento acelerado", desc: "Oportunidades ilimitadas para profissionais e clientes" },
+              { img: emojiLightbulb, title: "Inovação constante", desc: "Sempre evoluindo para oferecer a melhor experiência" },
+              { img: emojiShield, title: "Conexão segura", desc: "Conectamos você a profissionais verificados com segurança" },
+              { img: emojiRocket, title: "Crescimento acelerado", desc: "Oportunidades para profissionais e clientes crescerem juntos" },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -81,8 +78,8 @@ export const CTASection = () => {
                 transition={{ delay: i * 0.15, duration: 0.4 }}
                 whileHover={{ y: -4 }}
               >
-                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center text-2xl">
-                  {item.emoji}
+                <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-2xl flex items-center justify-center overflow-hidden">
+                  <img src={item.img} alt={item.title} className="w-12 h-12 object-contain" />
                 </div>
                 <h3 className="font-semibold text-foreground mb-2">{item.title}</h3>
                 <p className="text-sm text-muted-foreground">{item.desc}</p>

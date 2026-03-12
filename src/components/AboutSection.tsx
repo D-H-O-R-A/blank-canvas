@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
-import { Shield, Zap, Users, CheckCircle, ArrowRight, Star, TrendingUp, Heart } from "lucide-react";
+import { Shield, Zap, Users, CheckCircle, ArrowRight, Star, TrendingUp } from "lucide-react";
+import proJoao from "@/assets/pro-joao.jpg";
+import proMaria from "@/assets/pro-maria.jpg";
+import proCarlos from "@/assets/pro-carlos.jpg";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -13,26 +16,25 @@ export const AboutSection = () => {
     {
       icon: Shield,
       title: "Segurança",
-      description: "Profissionais verificados com background check completo e garantia total",
+      description: "Profissionais verificados com validação de dados e acompanhamento de reputação na plataforma",
       color: "from-blue-500 to-blue-600"
     },
     {
       icon: Zap,
       title: "Rapidez",
-      description: "Encontre e contrate o profissional ideal em menos de 60 segundos",
+      description: "Encontre e contrate o profissional ideal em poucos cliques, de forma simples e ágil",
       color: "from-yellow-500 to-orange-500"
     },
     {
       icon: Users,
       title: "Confiança",
-      description: "Avaliações reais, transparência total e suporte especializado 24/7",
+      description: "Avaliações reais de outros clientes e transparência total na escolha do profissional",
       color: "from-green-500 to-emerald-600"
     }
   ];
 
   return (
     <section id="sobre" className="section-padding bg-background relative overflow-hidden">
-      {/* Background patterns */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-r from-primary/10 to-transparent rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-l from-primary/5 to-transparent rounded-full blur-3xl"></div>
@@ -79,22 +81,17 @@ export const AboutSection = () => {
             >
               <div className="relative bg-white rounded-3xl p-8 shadow-soft border border-primary/5 overflow-hidden">
                 <div className={`absolute inset-0 bg-gradient-to-br ${principle.color} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}></div>
-
                 <div className="relative z-10 mb-6">
                   <div className={`w-16 h-16 bg-gradient-to-br ${principle.color} rounded-2xl flex items-center justify-center shadow-medium group-hover:shadow-large group-hover:scale-110 transition-all duration-500`}>
                     <principle.icon className="w-8 h-8 text-white" />
                   </div>
                 </div>
-
                 <div className="relative z-10">
                   <h3 className="text-2xl font-bold text-foreground mb-4 group-hover:text-primary transition-colors duration-300">
                     {principle.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    {principle.description}
-                  </p>
+                  <p className="text-muted-foreground leading-relaxed">{principle.description}</p>
                 </div>
-
                 <div className="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-primary/20 transition-all duration-500"></div>
               </div>
             </motion.div>
@@ -117,16 +114,16 @@ export const AboutSection = () => {
                 Seu próximo cliente está a um clique de distância
               </h3>
               <p className="text-white/80 text-lg leading-relaxed mb-8">
-                A Click Serviços não é apenas uma plataforma — é a sua vitrine digital. 
+                A Click Serviços é a sua vitrine digital. 
                 Profissionais que se cadastram aumentam sua visibilidade, conquistam novos clientes 
                 e constroem uma reputação sólida com avaliações verificadas.
               </p>
               <div className="space-y-4">
                 {[
-                  "Apareça para milhares de clientes na sua região",
+                  "Apareça para clientes na sua região",
                   "Receba agendamentos diretamente no seu celular",
                   "Construa sua marca pessoal com perfil profissional",
-                  "Sem taxas abusivas — você fica com o que é seu",
+                  "Planos acessíveis — você fica com o que é seu",
                 ].map((item, i) => (
                   <motion.div
                     key={i}
@@ -144,10 +141,10 @@ export const AboutSection = () => {
             </div>
             <div className="grid grid-cols-2 gap-6">
               {[
-                { number: "+300%", label: "Aumento na renda" },
-                { number: "24h", label: "Para 1º cliente" },
-                { number: "4.9★", label: "Avaliação média" },
-                { number: "0%", label: "Taxa de adesão" },
+                { number: "+1k", label: "Pré-cadastrados" },
+                { number: "24h", label: "Para 1º cliente*" },
+                { number: "4.9★", label: "Avaliação testadores" },
+                { number: "0%", label: "Taxa de adesão*" },
               ].map((stat, i) => (
                 <motion.div
                   key={i}
@@ -164,6 +161,7 @@ export const AboutSection = () => {
               ))}
             </div>
           </div>
+          <p className="text-white/50 text-xs mt-6 text-center">*Estimativas baseadas em testes internos. Resultados podem variar.</p>
         </motion.div>
 
         {/* Stats Grid */}
@@ -172,64 +170,29 @@ export const AboutSection = () => {
           {...fadeInUp}
         >
           <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div className="group">
-              <motion.div
-                className="text-4xl lg:text-5xl font-black text-primary mb-3"
-                whileHover={{ scale: 1.1 }}
-              >
-                +1k
-              </motion.div>
-              <div className="text-lg font-semibold text-foreground mb-1">Pro pré-cadastrado</div>
-              <div className="text-sm text-muted-foreground">Verificados ativamente</div>
-            </div>
-
-            <div className="group">
-              <motion.div
-                className="text-4xl lg:text-5xl font-black text-primary mb-3"
-                whileHover={{ scale: 1.1 }}
-              >
-                +150
-              </motion.div>
-              <div className="text-lg font-semibold text-foreground mb-1">Tipos de serviços</div>
-              <div className="text-sm text-muted-foreground">Categorias disponíveis</div>
-            </div>
-
-            <div className="group">
-              <motion.div
-                className="text-4xl lg:text-5xl font-black text-primary mb-3"
-                whileHover={{ scale: 1.1 }}
-              >
-                4.9★
-              </motion.div>
-              <div className="text-lg font-semibold text-foreground mb-1">Avaliação dos testadores</div>
-              <div className="text-sm text-muted-foreground">Média da plataforma</div>
-            </div>
-
-            <div className="group">
-              <motion.div
-                className="text-4xl lg:text-5xl font-black text-primary mb-3"
-                whileHover={{ scale: 1.1 }}
-              >
-                99%
-              </motion.div>
-              <div className="text-lg font-semibold text-foreground mb-1">Satisfação</div>
-              <div className="text-sm text-muted-foreground">Clientes recomendam</div>
-            </div>
+            {[
+              { value: "+1k", title: "Pro pré-cadastrado", sub: "E crescendo" },
+              { value: "+150", title: "Tipos de serviços", sub: "Categorias disponíveis" },
+              { value: "4.9★", title: "Avaliação dos testadores", sub: "Média da plataforma" },
+              { value: "99%", title: "Satisfação", sub: "Dos testadores" },
+            ].map((stat, i) => (
+              <div key={i} className="group">
+                <motion.div className="text-4xl lg:text-5xl font-black text-primary mb-3" whileHover={{ scale: 1.1 }}>
+                  {stat.value}
+                </motion.div>
+                <div className="text-lg font-semibold text-foreground mb-1">{stat.title}</div>
+                <div className="text-sm text-muted-foreground">{stat.sub}</div>
+              </div>
+            ))}
           </div>
         </motion.div>
 
-        {/* Feature Highlights - Updated */}
+        {/* Feature Highlights */}
         <div className="mt-24 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div className="space-y-8" {...fadeInUp}>
-            <h3 className="text-3xl font-bold text-foreground">
-              Por que somos diferentes?
-            </h3>
-
+            <h3 className="text-3xl font-bold text-foreground">Por que somos diferentes?</h3>
             <div className="space-y-6">
-              <motion.div
-                className="flex items-start gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors duration-300"
-                whileHover={{ x: 5 }}
-              >
+              <motion.div className="flex items-start gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors duration-300" whileHover={{ x: 5 }}>
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <CheckCircle className="w-5 h-5 text-primary" />
                 </div>
@@ -239,10 +202,7 @@ export const AboutSection = () => {
                 </div>
               </motion.div>
 
-              <motion.div
-                className="flex items-start gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors duration-300"
-                whileHover={{ x: 5 }}
-              >
+              <motion.div className="flex items-start gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors duration-300" whileHover={{ x: 5 }}>
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <CheckCircle className="w-5 h-5 text-primary" />
                 </div>
@@ -274,35 +234,27 @@ export const AboutSection = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <motion.div
-                    className="flex items-center gap-3 p-3 bg-primary/5 rounded-2xl cursor-pointer"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="w-10 h-10 bg-primary rounded-xl"></div>
-                    <div className="flex-1">
-                      <div className="font-medium text-foreground">João Silva</div>
-                      <div className="text-sm text-muted-foreground">Eletricista • 4.9★ • 2.1km</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-primary">R$ 120</div>
-                      <div className="text-xs text-muted-foreground">Visita</div>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    className="flex items-center gap-3 p-3 rounded-2xl border border-primary/10 cursor-pointer"
-                    whileHover={{ scale: 1.02 }}
-                  >
-                    <div className="w-10 h-10 bg-muted rounded-xl"></div>
-                    <div className="flex-1">
-                      <div className="font-medium text-foreground">Maria Santos</div>
-                      <div className="text-sm text-muted-foreground">Eletricista • 4.8★ • 3.5km</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-foreground">R$ 150</div>
-                      <div className="text-xs text-muted-foreground">Visita</div>
-                    </div>
-                  </motion.div>
+                  {[
+                    { name: "João Silva", role: "Eletricista • 4.9★ • 2.1km", price: "R$ 120", img: proJoao, highlight: true },
+                    { name: "Maria Santos", role: "Eletricista • 4.8★ • 3.5km", price: "R$ 150", img: proMaria, highlight: false },
+                    { name: "Carlos Lima", role: "Eletricista • 4.7★ • 4.2km", price: "R$ 130", img: proCarlos, highlight: false },
+                  ].map((pro, i) => (
+                    <motion.div
+                      key={i}
+                      className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer ${pro.highlight ? "bg-primary/5" : "border border-primary/10"}`}
+                      whileHover={{ scale: 1.02 }}
+                    >
+                      <img src={pro.img} alt={pro.name} className="w-10 h-10 rounded-xl object-cover" />
+                      <div className="flex-1">
+                        <div className="font-medium text-foreground">{pro.name}</div>
+                        <div className="text-sm text-muted-foreground">{pro.role}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-sm font-medium ${pro.highlight ? "text-primary" : "text-foreground"}`}>{pro.price}</div>
+                        <div className="text-xs text-muted-foreground">Visita</div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
 
                 <motion.button
@@ -316,7 +268,6 @@ export const AboutSection = () => {
               </div>
             </div>
 
-            {/* Floating elements */}
             <motion.div
               className="absolute -top-4 -right-4 bg-success text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-large"
               animate={{ y: [0, -5, 0] }}
@@ -327,7 +278,7 @@ export const AboutSection = () => {
             <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-3 shadow-large">
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
-                <span className="text-sm font-medium">100% Garantido</span>
+                <span className="text-sm font-medium">Verificado</span>
               </div>
             </div>
           </motion.div>
