@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Star, Shield, Zap, Play } from "lucide-react";
 
@@ -53,9 +54,19 @@ export const HeroSection = () => {
       <div className="container-custom section-padding relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 lg:gap-20 items-center min-h-[90vh]">
           {/* Left Column - Hero Content */}
-          <div className="space-y-8 lg:space-y-12">
+          <motion.div
+            className="space-y-8 lg:space-y-12"
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
             {/* Trust Badge */}
-            <div className="inline-flex items-center gap-3 glass-effect text-primary px-6 py-3 rounded-2xl text-sm font-semibold">
+            <motion.div
+              className="inline-flex items-center gap-3 glass-effect text-primary px-6 py-3 rounded-2xl text-sm font-semibold"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
               <div className="relative">
                 <Star className="w-5 h-5 fill-current" />
                 <div className="absolute inset-0 animate-ping">
@@ -63,7 +74,7 @@ export const HeroSection = () => {
                 </div>
               </div>
               <span>Plataforma #1 em Serviços Premium</span>
-            </div>
+            </motion.div>
 
             {/* Main Headlines */}
             <div className="space-y-6">
@@ -85,84 +96,87 @@ export const HeroSection = () => {
 
             {/* Trust Indicators Grid */}
             <div className="grid grid-cols-3 gap-6">
-              <div className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-foreground">100% Seguro</div>
-                  <div className="text-xs text-muted-foreground">Verificados</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <Zap className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-foreground">Instantâneo</div>
-                  <div className="text-xs text-muted-foreground">Em segundos</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <div className="text-sm font-bold text-foreground">Garantido</div>
-                  <div className="text-xs text-muted-foreground">Satisfação</div>
-                </div>
-              </div>
+              {[
+                { icon: Shield, title: "100% Seguro", sub: "Verificados" },
+                { icon: Zap, title: "Instantâneo", sub: "Em segundos" },
+                { icon: CheckCircle, title: "Garantido", sub: "Satisfação" },
+              ].map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  className="flex items-center gap-3 p-4 bg-white/50 backdrop-blur-sm rounded-2xl hover-lift cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1, duration: 0.4 }}
+                >
+                  <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <item.icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-bold text-foreground">{item.title}</div>
+                    <div className="text-xs text-muted-foreground">{item.sub}</div>
+                  </div>
+                </motion.div>
+              ))}
             </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6">
-              <Button
-                variant="hero"
-                size="xl"
-                className="group text-lg px-12 py-6 h-auto btn-liquid glow-primary"
-                onClick={() => {
-                  const element = document.getElementById("sobre");
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                Quero Contratar
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  variant="hero"
+                  size="xl"
+                  className="group text-lg px-12 py-6 h-auto btn-liquid glow-primary"
+                  onClick={() => {
+                    const element = document.getElementById("sobre");
+                    element?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Quero Contratar
+                  <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" />
+                </Button>
+              </motion.div>
 
-              <Button
-                variant="outline"
-                size="xl"
-                className="text-lg px-12 py-6 h-auto btn-liquid border-2 border-primary/20 hover:border-primary hover:bg-primary/5"
-                onClick={() => {
-                  const element = document.getElementById("seja-profissional");
-                  element?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                Sou Profissional
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
+                <Button
+                  variant="outline"
+                  size="xl"
+                  className="text-lg px-12 py-6 h-auto btn-liquid border-2 border-primary/20 hover:border-primary hover:bg-primary/5"
+                  onClick={() => {
+                    const element = document.getElementById("seja-profissional");
+                    element?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Sou Profissional
+                </Button>
+              </motion.div>
             </div>
 
             {/* Social Proof */}
             <div className="flex items-center gap-8 pt-8 border-t border-primary/10">
               <div className="text-center">
-                <div className="text-3xl font-black text-primary">15K+</div>
-                <div className="text-sm text-muted-foreground">Profissionais</div>
+                <div className="text-3xl font-black text-primary">+1k</div>
+                <div className="text-sm text-muted-foreground">Pro pré-cadastrado</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-black text-primary">150K+</div>
-                <div className="text-sm text-muted-foreground">Serviços</div>
+                <div className="text-3xl font-black text-primary">+150</div>
+                <div className="text-sm text-muted-foreground">Tipos de serviços</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-black text-primary">4.9★</div>
-                <div className="text-sm text-muted-foreground">Avaliação</div>
+                <div className="text-sm text-muted-foreground">Avaliação dos testadores</div>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Column - 3D Mockup & Visual */}
-          <div className="relative">
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          >
             {/* 3D Background Elements */}
             <div className="absolute inset-0">
               <div
@@ -181,7 +195,11 @@ export const HeroSection = () => {
 
             {/* Main Phone Mockup */}
             <div className="relative z-10 max-w-lg mx-auto">
-              <div className="relative transform hover:scale-105 transition-transform duration-500">
+              <motion.div
+                className="relative"
+                whileHover={{ scale: 1.03 }}
+                transition={{ duration: 0.5 }}
+              >
                 {/* Phone Frame */}
                 <div className="bg-white rounded-[3rem] p-8 shadow-xl">
                   <div className="aspect-[9/19] bg-gradient-to-br from-primary/5 to-primary/10 rounded-[2.5rem] p-6 relative overflow-hidden">
@@ -208,8 +226,8 @@ export const HeroSection = () => {
                       </div>
 
                       <div className="bg-gradient-emerald rounded-2xl p-4 text-white">
-                        <div className="text-sm font-semibold">João está a caminho!</div>
-                        <div className="text-xs opacity-90">Chegada em 8 minutos</div>
+                        <div className="text-sm font-semibold">João confirmou o agendamento!</div>
+                        <div className="text-xs opacity-90 mt-1">O encanador João estará disponível para ir até sua casa entre 8h e 12h.</div>
                       </div>
                     </div>
 
@@ -220,7 +238,12 @@ export const HeroSection = () => {
                 </div>
 
                 {/* Floating UI Elements */}
-                <div className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-large max-w-48">
+                <motion.div
+                  className="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-large max-w-48"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1, duration: 0.5 }}
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-success rounded-full flex items-center justify-center">
                       <CheckCircle className="w-5 h-5 text-white" />
@@ -230,21 +253,26 @@ export const HeroSection = () => {
                       <div className="text-xs text-muted-foreground">Profissional aprovado</div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-large">
+                <motion.div
+                  className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-large"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 1.2, duration: 0.5 }}
+                >
                   <div className="flex items-center gap-2">
                     <div className="flex -space-x-2">
-                      <div className="w-8 h-8 bg-primary rounded-full border-2 border-white"></div>
-                      <div className="w-8 h-8 bg-navy rounded-full border-2 border-white"></div>
-                      <div className="w-8 h-8 bg-success rounded-full border-2 border-white"></div>
+                      <img src="/lovable-uploads/person-1.jpg" alt="Usuário" className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                      <img src="/lovable-uploads/person-2.jpg" alt="Usuário" className="w-8 h-8 rounded-full border-2 border-white object-cover" />
+                      <img src="/lovable-uploads/person-3.jpg" alt="Usuário" className="w-8 h-8 rounded-full border-2 border-white object-cover" />
                     </div>
-                    <div className="text-sm font-medium">+5K felizes</div>
+                    <div className="text-sm font-medium">+5K Likes</div>
                   </div>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
