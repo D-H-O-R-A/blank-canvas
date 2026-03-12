@@ -1,4 +1,12 @@
-import { Shield, Zap, Users, CheckCircle, ArrowRight, Star } from "lucide-react";
+import { motion } from "framer-motion";
+import { Shield, Zap, Users, CheckCircle, ArrowRight, Star, TrendingUp, Heart } from "lucide-react";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-100px" },
+  transition: { duration: 0.6 },
+};
 
 export const AboutSection = () => {
   const principles = [
@@ -32,7 +40,7 @@ export const AboutSection = () => {
 
       <div className="container-custom relative z-10">
         {/* Header */}
-        <div className="text-center max-w-4xl mx-auto mb-20">
+        <motion.div className="text-center max-w-4xl mx-auto mb-20" {...fadeInUp}>
           <div className="inline-flex items-center gap-3 glass-effect text-primary px-6 py-3 rounded-2xl text-sm font-semibold mb-8">
             <Star className="w-5 h-5 fill-current" />
             <span>Sobre a Plataforma</span>
@@ -56,14 +64,18 @@ export const AboutSection = () => {
             <br className="hidden md:block" />
             Tecnologia de ponta, experiência humana excepcional.
           </p>
-        </div>
+        </motion.div>
 
         {/* Three Principles */}
         <div className="grid md:grid-cols-3 gap-8 mb-24">
-          {principles.map((principle) => (
-            <div
+          {principles.map((principle, i) => (
+            <motion.div
               key={principle.title}
               className="group hover-lift"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.15, duration: 0.5 }}
             >
               <div className="relative bg-white rounded-3xl p-8 shadow-soft border border-primary/5 overflow-hidden">
                 <div className={`absolute inset-0 bg-gradient-to-br ${principle.color} opacity-5 group-hover:opacity-10 transition-opacity duration-500`}></div>
@@ -85,88 +97,170 @@ export const AboutSection = () => {
 
                 <div className="absolute inset-0 rounded-3xl border-2 border-transparent group-hover:border-primary/20 transition-all duration-500"></div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
+        {/* Persuasive Section */}
+        <motion.div
+          className="bg-gradient-to-br from-navy to-navy-light rounded-3xl p-10 md:p-16 mb-24 text-white relative overflow-hidden"
+          {...fadeInUp}
+        >
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+          <div className="grid md:grid-cols-2 gap-12 items-center relative z-10">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm font-medium mb-6">
+                <TrendingUp className="w-4 h-4" />
+                <span>Por que a Click Serviços?</span>
+              </div>
+              <h3 className="text-3xl md:text-4xl font-black mb-6 leading-tight">
+                Seu próximo cliente está a um clique de distância
+              </h3>
+              <p className="text-white/80 text-lg leading-relaxed mb-8">
+                A Click Serviços não é apenas uma plataforma — é a sua vitrine digital. 
+                Profissionais que se cadastram aumentam sua visibilidade, conquistam novos clientes 
+                e constroem uma reputação sólida com avaliações verificadas.
+              </p>
+              <div className="space-y-4">
+                {[
+                  "Apareça para milhares de clientes na sua região",
+                  "Receba agendamentos diretamente no seu celular",
+                  "Construa sua marca pessoal com perfil profissional",
+                  "Sem taxas abusivas — você fica com o que é seu",
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    className="flex items-center gap-3"
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1, duration: 0.4 }}
+                  >
+                    <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-white/90">{item}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              {[
+                { number: "+300%", label: "Aumento na renda" },
+                { number: "24h", label: "Para 1º cliente" },
+                { number: "4.9★", label: "Avaliação média" },
+                { number: "0%", label: "Taxa de adesão" },
+              ].map((stat, i) => (
+                <motion.div
+                  key={i}
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center hover:bg-white/15 transition-colors duration-300"
+                  whileHover={{ scale: 1.05 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1, duration: 0.4 }}
+                >
+                  <div className="text-3xl font-black text-primary mb-1">{stat.number}</div>
+                  <div className="text-sm text-white/70">{stat.label}</div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
         {/* Stats Grid */}
-        <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 md:p-12">
+        <motion.div
+          className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-3xl p-8 md:p-12"
+          {...fadeInUp}
+        >
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="group">
-              <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
-                15K+
-              </div>
-              <div className="text-lg font-semibold text-foreground mb-1">Profissionais</div>
+              <motion.div
+                className="text-4xl lg:text-5xl font-black text-primary mb-3"
+                whileHover={{ scale: 1.1 }}
+              >
+                +1k
+              </motion.div>
+              <div className="text-lg font-semibold text-foreground mb-1">Pro pré-cadastrado</div>
               <div className="text-sm text-muted-foreground">Verificados ativamente</div>
             </div>
 
             <div className="group">
-              <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
-                150K+
-              </div>
-              <div className="text-lg font-semibold text-foreground mb-1">Serviços</div>
-              <div className="text-sm text-muted-foreground">Realizados com sucesso</div>
+              <motion.div
+                className="text-4xl lg:text-5xl font-black text-primary mb-3"
+                whileHover={{ scale: 1.1 }}
+              >
+                +150
+              </motion.div>
+              <div className="text-lg font-semibold text-foreground mb-1">Tipos de serviços</div>
+              <div className="text-sm text-muted-foreground">Categorias disponíveis</div>
             </div>
 
             <div className="group">
-              <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
+              <motion.div
+                className="text-4xl lg:text-5xl font-black text-primary mb-3"
+                whileHover={{ scale: 1.1 }}
+              >
                 4.9★
-              </div>
-              <div className="text-lg font-semibold text-foreground mb-1">Avaliação</div>
+              </motion.div>
+              <div className="text-lg font-semibold text-foreground mb-1">Avaliação dos testadores</div>
               <div className="text-sm text-muted-foreground">Média da plataforma</div>
             </div>
 
             <div className="group">
-              <div className="text-4xl lg:text-5xl font-black text-primary mb-3 group-hover:scale-110 transition-transform duration-300">
+              <motion.div
+                className="text-4xl lg:text-5xl font-black text-primary mb-3"
+                whileHover={{ scale: 1.1 }}
+              >
                 99%
-              </div>
+              </motion.div>
               <div className="text-lg font-semibold text-foreground mb-1">Satisfação</div>
               <div className="text-sm text-muted-foreground">Clientes recomendam</div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Feature Highlights */}
+        {/* Feature Highlights - Updated */}
         <div className="mt-24 grid lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
+          <motion.div className="space-y-8" {...fadeInUp}>
             <h3 className="text-3xl font-bold text-foreground">
               Por que somos diferentes?
             </h3>
 
             <div className="space-y-6">
-              <div className="flex items-start gap-4">
+              <motion.div
+                className="flex items-start gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors duration-300"
+                whileHover={{ x: 5 }}
+              >
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <CheckCircle className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Verificação em 3 níveis</h4>
-                  <p className="text-muted-foreground">Background check, validação de habilidades e teste prático para cada profissional.</p>
+                  <p className="text-muted-foreground">Background check, validação com base em experiências na plataforma e verificação de dados do profissional.</p>
                 </div>
-              </div>
+              </motion.div>
 
-              <div className="flex items-start gap-4">
+              <motion.div
+                className="flex items-start gap-4 p-4 rounded-2xl hover:bg-primary/5 transition-colors duration-300"
+                whileHover={{ x: 5 }}
+              >
                 <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
                   <CheckCircle className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Matching inteligente</h4>
-                  <p className="text-muted-foreground">IA que conecta você com o profissional ideal baseado em localização, especialidade e disponibilidade.</p>
+                  <p className="text-muted-foreground">IA que conecta você com o profissional ideal baseado em localização, especialidade, disponibilidade e necessidade.</p>
                 </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
-                  <CheckCircle className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-2">Garantia total</h4>
-                  <p className="text-muted-foreground">Se não ficar satisfeito, devolvemos seu dinheiro ou refazemos o serviço sem custo adicional.</p>
-                </div>
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="relative">
+          <motion.div
+            className="relative"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
             <div className="relative z-10 bg-white rounded-3xl p-8 shadow-xl">
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
@@ -180,7 +274,10 @@ export const AboutSection = () => {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 p-3 bg-primary/5 rounded-2xl">
+                  <motion.div
+                    className="flex items-center gap-3 p-3 bg-primary/5 rounded-2xl cursor-pointer"
+                    whileHover={{ scale: 1.02 }}
+                  >
                     <div className="w-10 h-10 bg-primary rounded-xl"></div>
                     <div className="flex-1">
                       <div className="font-medium text-foreground">João Silva</div>
@@ -190,9 +287,12 @@ export const AboutSection = () => {
                       <div className="text-sm font-medium text-primary">R$ 120</div>
                       <div className="text-xs text-muted-foreground">Visita</div>
                     </div>
-                  </div>
+                  </motion.div>
 
-                  <div className="flex items-center gap-3 p-3 rounded-2xl border border-primary/10">
+                  <motion.div
+                    className="flex items-center gap-3 p-3 rounded-2xl border border-primary/10 cursor-pointer"
+                    whileHover={{ scale: 1.02 }}
+                  >
                     <div className="w-10 h-10 bg-muted rounded-xl"></div>
                     <div className="flex-1">
                       <div className="font-medium text-foreground">Maria Santos</div>
@@ -202,27 +302,35 @@ export const AboutSection = () => {
                       <div className="text-sm font-medium text-foreground">R$ 150</div>
                       <div className="text-xs text-muted-foreground">Visita</div>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
 
-                <button className="w-full bg-gradient-emerald text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 group">
+                <motion.button
+                  className="w-full bg-gradient-emerald text-white py-4 rounded-2xl font-semibold flex items-center justify-center gap-2 group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   Contratar João Silva
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                </button>
+                </motion.button>
               </div>
             </div>
 
             {/* Floating elements */}
-            <div className="absolute -top-4 -right-4 bg-success text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-large">
+            <motion.div
+              className="absolute -top-4 -right-4 bg-success text-white px-4 py-2 rounded-2xl text-sm font-medium shadow-large"
+              animate={{ y: [0, -5, 0] }}
+              transition={{ repeat: Infinity, duration: 3 }}
+            >
               Disponível agora
-            </div>
+            </motion.div>
             <div className="absolute -bottom-4 -left-4 bg-white rounded-2xl p-3 shadow-large">
               <div className="flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
                 <span className="text-sm font-medium">100% Garantido</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

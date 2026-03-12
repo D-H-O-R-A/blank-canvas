@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { UserPlus, Search, Calendar, CheckCircle } from "lucide-react";
 
 export const HowItWorksSection = () => {
@@ -32,7 +33,13 @@ export const HowItWorksSection = () => {
     <section id="como-funciona" className="py-20 lg:py-32 bg-muted/30">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
+        <motion.div
+          className="text-center max-w-3xl mx-auto mb-16 lg:mb-20"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
             <Calendar className="w-4 h-4" />
             <span>Como Funciona</span>
@@ -47,21 +54,28 @@ export const HowItWorksSection = () => {
             Nossa plataforma foi projetada para ser intuitiva e eficiente.
             Veja como é fácil encontrar o profissional ideal.
           </p>
-        </div>
+        </motion.div>
 
         {/* Steps Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
           {steps.map((step, index) => (
-            <div
+            <motion.div
               key={step.title}
               className="relative group"
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.15, duration: 0.5 }}
             >
               {/* Connector Line (desktop only) */}
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute top-16 left-[calc(100%-2rem)] w-8 h-0.5 bg-gradient-to-r from-primary to-primary/30 z-10"></div>
               )}
 
-              <div className="bg-white rounded-2xl p-6 text-center shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-2 relative z-20">
+              <motion.div
+                className="bg-white rounded-2xl p-6 text-center shadow-soft hover:shadow-medium transition-all duration-300 relative z-20"
+                whileHover={{ y: -8, scale: 1.02 }}
+              >
                 {/* Step Number */}
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
                   {index + 1}
@@ -82,13 +96,19 @@ export const HowItWorksSection = () => {
                 <p className="text-sm text-primary font-medium">
                   {step.details}
                 </p>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           ))}
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-16">
+        <motion.div
+          className="text-center mt-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <div className="bg-white rounded-3xl p-8 md:p-12 shadow-soft max-w-4xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="text-left">
@@ -100,24 +120,40 @@ export const HowItWorksSection = () => {
                   de encontrar profissionais qualificados.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button className="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-hover transition-colors duration-300">
+                  <motion.button
+                    className="bg-primary text-white px-6 py-3 rounded-xl font-medium hover:bg-primary-hover transition-colors duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     Começar agora
-                  </button>
-                  <button className="border border-border px-6 py-3 rounded-xl font-medium hover:border-primary hover:text-primary transition-colors duration-300">
+                  </motion.button>
+                  <motion.button
+                    className="border border-border px-6 py-3 rounded-xl font-medium hover:border-primary hover:text-primary transition-colors duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
                     Ver exemplo
-                  </button>
+                  </motion.button>
                 </div>
               </div>
 
               <div className="relative">
-                <div className="w-64 h-64 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center">
-                  <div className="text-6xl">📱</div>
+                <div className="w-64 h-64 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-3xl flex items-center justify-center overflow-hidden">
+                  <img
+                    src="/lovable-uploads/cel.png"
+                    alt="App Click Serviços"
+                    className="w-full h-full object-contain"
+                  />
                 </div>
 
                 {/* Floating elements */}
-                <div className="absolute top-4 right-4 bg-success text-white px-3 py-1 rounded-full text-xs font-medium">
+                <motion.div
+                  className="absolute top-4 right-4 bg-success text-white px-3 py-1 rounded-full text-xs font-medium"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ repeat: Infinity, duration: 2.5 }}
+                >
                   Online
-                </div>
+                </motion.div>
                 <div className="absolute bottom-4 left-4 bg-white shadow-medium rounded-lg p-2 text-xs">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -127,7 +163,7 @@ export const HowItWorksSection = () => {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
