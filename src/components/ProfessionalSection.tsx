@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, Shield, CreditCard, Zap, TrendingUp, Users, Award, CheckCircle, ArrowRight, Heart, Target } from "lucide-react";
+import { Star, CreditCard, Zap, TrendingUp, Users, Award, CheckCircle, ArrowRight, Target } from "lucide-react";
 import { PartnersSection } from "./PartnersSection";
 
 export const ProfessionalSection = () => {
@@ -24,22 +24,22 @@ export const ProfessionalSection = () => {
     {
       icon: TrendingUp,
       title: "Destaque Premium",
-      description: "Apareça primeiro nas buscas e ganhe 3x mais clientes"
+      description: "Apareça primeiro nas buscas e aumente suas chances de ser contratado"
     },
     {
       icon: Users,
       title: "Avaliações Verificadas",
-      description: "Sistema transparente que constrói sua reputação sólida"
+      description: "Sistema transparente que constrói sua reputação na plataforma"
     },
     {
-      icon: Shield,
-      title: "Contratos Seguros",
-      description: "Proteção legal completa em todas as negociações"
+      icon: Star,
+      title: "Perfil Profissional",
+      description: "Sua vitrine digital para mostrar seu trabalho e atrair clientes"
     },
     {
       icon: CreditCard,
-      title: "Pagamento Garantido",
-      description: "Receba em até 24h após conclusão do serviço"
+      title: "Planos Acessíveis",
+      description: "Invista pouco para ter acesso a uma base crescente de clientes"
     }
   ];
 
@@ -80,7 +80,6 @@ export const ProfessionalSection = () => {
   return (
     <>
       <section id="seja-profissional" className="section-padding bg-gradient-to-br from-primary/5 via-background to-primary/10 relative overflow-hidden">
-        {/* Background effects */}
         <div className="absolute inset-0">
           <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-emerald opacity-5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-primary opacity-10 rounded-full blur-3xl"></div>
@@ -103,15 +102,15 @@ export const ProfessionalSection = () => {
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-8 leading-tight">
               Transforme seu talento em{" "}
               <span className="text-gradient-primary relative">
-                renda premium
+                oportunidades
                 <div className="absolute -bottom-3 left-0 right-0 h-6 bg-gradient-emerald opacity-20 rounded-full transform rotate-1"></div>
               </span>
             </h2>
 
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-light mb-8">
-              Junte-se à elite dos prestadores de serviço. Clientes premium,
+              Cadastre-se e esteja entre os primeiros profissionais da plataforma.
               <br className="hidden md:block" />
-              pagamentos garantidos e crescimento acelerado.
+              Quando lançarmos, você já estará na frente.
             </p>
 
             {/* Persuasive sub-text */}
@@ -119,11 +118,11 @@ export const ProfessionalSection = () => {
               <div className="flex items-start gap-4">
                 <Target className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
                 <div className="text-left">
-                  <h4 className="font-bold text-foreground mb-2">Por que fechar com a Click Serviços?</h4>
+                  <h4 className="font-bold text-foreground mb-2">Por que se pré-cadastrar na Click Serviços?</h4>
                   <p className="text-muted-foreground leading-relaxed">
-                    A Click Serviços investe em marketing digital para trazer clientes até você. 
-                    Nossos profissionais cadastrados relatam um aumento médio de <strong className="text-primary">300% na renda</strong> nos primeiros 3 meses. 
-                    Você foca no que faz de melhor — nós cuidamos de trazer os clientes.
+                    A Click Serviços conecta clientes que precisam de serviços diretamente a você. 
+                    Ao se cadastrar agora, você garante seu lugar como um dos primeiros profissionais da plataforma, 
+                    ganhando <strong className="text-primary">visibilidade desde o primeiro dia</strong> do lançamento.
                   </p>
                 </div>
               </div>
@@ -137,7 +136,7 @@ export const ProfessionalSection = () => {
                     size="xl"
                     className="text-lg px-16 py-8 h-auto btn-liquid glow-primary text-xl font-bold"
                   >
-                    Cadastrar-me Agora
+                    Pré-cadastrar Agora
                     <Star className="w-6 h-6 ml-2" />
                   </Button>
                 </motion.div>
@@ -150,7 +149,7 @@ export const ProfessionalSection = () => {
                       <div className="w-10 h-10 bg-gradient-emerald rounded-xl flex items-center justify-center">
                         <Award className="w-5 h-5 text-white" />
                       </div>
-                      Torne-se um Profissional Elite
+                      Pré-cadastro Profissional
                     </DialogTitle>
                   </div>
                 </DialogHeader>
@@ -190,7 +189,7 @@ export const ProfessionalSection = () => {
                     </div>
                   </div>
 
-                  {/* Plans Selection */}
+                  {/* Plans */}
                   <div className="space-y-4">
                     <Label>Escolha seu plano</Label>
                     <div className="grid gap-4">
@@ -221,9 +220,6 @@ export const ProfessionalSection = () => {
                                 </div>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <div className="text-xs text-muted-foreground mb-1">{plan.features.length} recursos</div>
-                            </div>
                           </div>
                           <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                             {plan.features.slice(0, 4).map((feature, idx) => (
@@ -238,7 +234,7 @@ export const ProfessionalSection = () => {
                     </div>
                   </div>
 
-                  {/* Payment Method */}
+                  {/* Payment */}
                   <div className="space-y-3">
                     <Label>Forma de pagamento</Label>
                     <div className="grid grid-cols-2 gap-4">
@@ -268,7 +264,7 @@ export const ProfessionalSection = () => {
                   </div>
 
                   <Button type="submit" variant="hero" size="lg" className="w-full h-14 text-lg font-bold" disabled={!formData.name || !formData.email || !formData.plan}>
-                    Finalizar Cadastro Premium
+                    Finalizar Pré-cadastro
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Button>
 
@@ -303,7 +299,7 @@ export const ProfessionalSection = () => {
             ))}
           </div>
 
-          {/* Retorno para prestadores - persuasive */}
+          {/* Retorno para prestadores */}
           <motion.div
             className="bg-white rounded-3xl p-10 md:p-14 shadow-soft mb-20 border border-primary/10"
             initial={{ opacity: 0, y: 30 }}
@@ -314,18 +310,18 @@ export const ProfessionalSection = () => {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium mb-6">
-                  <Heart className="w-4 h-4" />
-                  <span>Retorno Garantido</span>
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Seu Crescimento</span>
                 </div>
                 <h3 className="text-3xl font-bold text-foreground mb-6">
-                  Como a Click Serviços traz retorno para você
+                  Como a Click Serviços conecta você a clientes
                 </h3>
                 <div className="space-y-4">
                   {[
-                    { title: "Marketing Digital", desc: "Investimos em anúncios para atrair clientes diretamente para o seu perfil." },
                     { title: "Algoritmo de Matching", desc: "Nossa IA conecta os clientes certos com o profissional certo, aumentando sua taxa de conversão." },
                     { title: "Perfil Otimizado", desc: "Criamos uma vitrine digital profissional que transmite confiança e credibilidade." },
                     { title: "Avaliações que Vendem", desc: "Cada serviço bem feito gera avaliações positivas que atraem novos clientes automaticamente." },
+                    { title: "Visibilidade na Região", desc: "Clientes próximos encontram você facilmente pela localização e especialidade." },
                   ].map((item, i) => (
                     <motion.div
                       key={i}
@@ -346,10 +342,10 @@ export const ProfessionalSection = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { icon: TrendingUp, stat: "+300%", label: "Aumento na renda" },
-                  { icon: Users, stat: "+1k", label: "Pros cadastrados" },
-                  { icon: Star, stat: "4.9★", label: "Satisfação" },
-                  { icon: Zap, stat: "24h", label: "Para 1º cliente" },
+                  { icon: TrendingUp, stat: "+1k", label: "Pré-cadastrados" },
+                  { icon: Users, stat: "+150", label: "Tipos de serviço" },
+                  { icon: Star, stat: "4.9★", label: "Avaliação testadores" },
+                  { icon: Zap, stat: "Em breve", label: "Lançamento" },
                 ].map((item, i) => (
                   <motion.div
                     key={i}
@@ -381,24 +377,21 @@ export const ProfessionalSection = () => {
             transition={{ duration: 0.6 }}
           >
             <h3 className="text-3xl font-bold text-foreground mb-8">
-              Histórias de Sucesso
+              Nosso Potencial
             </h3>
             <div className="grid md:grid-cols-3 gap-8">
               {[
-                { stat: "+300%", label: "Aumento médio na renda dos profissionais" },
-                { stat: "24h", label: "Tempo médio para primeiro cliente" },
-                { stat: "4.9★", label: "Avaliação média dos nossos pros" },
+                { stat: "+1k", label: "Profissionais pré-cadastrados e prontos para o lançamento" },
+                { stat: "Em breve", label: "Plataforma será lançada com base sólida de profissionais" },
+                { stat: "4.9★", label: "Avaliação média dos nossos testadores beta" },
               ].map((item, i) => (
-                <motion.div
-                  key={i}
-                  className="text-center"
-                  whileHover={{ scale: 1.05 }}
-                >
+                <motion.div key={i} className="text-center" whileHover={{ scale: 1.05 }}>
                   <div className="text-4xl font-black text-primary mb-2">{item.stat}</div>
                   <div className="text-sm text-muted-foreground">{item.label}</div>
                 </motion.div>
               ))}
             </div>
+            <p className="text-xs text-muted-foreground mt-6">*Dados baseados em pré-cadastros e testes internos. Resultados futuros podem variar.</p>
           </motion.div>
         </div>
       </section>

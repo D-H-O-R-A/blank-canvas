@@ -25,7 +25,7 @@ export const Footer = () => {
       <div className="container mx-auto px-4 lg:px-8 relative z-10">
         <div className="py-16 lg:py-20">
           <div className="grid lg:grid-cols-4 gap-12 lg:gap-16">
-            {/* Brand Column */}
+            {/* Brand */}
             <div className="lg:col-span-1">
               <div className="flex items-center space-x-2 mb-6">
                 <img src="/lovable-uploads/logo.png" alt="Click Serviços" className="w-10 h-10 rounded-xl object-contain" />
@@ -109,7 +109,17 @@ export const Footer = () => {
         <div className="border-t border-white/10 py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-white/70 text-sm">© 2025 Click Serviços, Inc. Todos os direitos reservados.</div>
-            <div className="text-white/70 text-sm">Feito com ❤️ no Brasil</div>
+            <div className="text-white/70 text-sm">
+              Powered By{" "}
+              <a 
+                href="https://better2better.com.br" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-primary hover:underline font-medium"
+              >
+                Better2better.com.br
+              </a>
+            </div>
           </div>
         </div>
       </div>

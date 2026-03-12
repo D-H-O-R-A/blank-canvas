@@ -1,35 +1,39 @@
 import { motion } from "framer-motion";
 import { Star, Quote } from "lucide-react";
+import reviewPerson1 from "@/assets/review-person-1.jpg";
+import reviewPerson2 from "@/assets/review-person-2.jpg";
+import reviewPerson3 from "@/assets/review-person-3.jpg";
+import reviewPerson4 from "@/assets/review-person-4.jpg";
 
 export const TestimonialsSection = () => {
   const testimonials = [
     {
       name: "Maria Silva",
-      role: "Cliente",
-      avatar: "/lovable-uploads/af549c20-f0ff-4bc0-9c4e-5440a094d9eb.png",
+      role: "Testadora Beta",
+      avatar: reviewPerson1,
       rating: 5,
-      text: "Encontrei um eletricista excelente pelo Click Serviços. O profissional chegou no horário e resolveu meu problema rapidamente. Super recomendo!"
+      text: "Testei a plataforma e achei incrível a facilidade de encontrar profissionais. A interface é muito intuitiva e prática!"
     },
     {
       name: "João Santos",
-      role: "Encanador Profissional",
-      avatar: "/lovable-uploads/a8412fbe-533c-4921-9230-a96f6802f2d6.png",
+      role: "Profissional Pré-cadastrado",
+      avatar: reviewPerson2,
       rating: 5,
-      text: "Como profissional, o Click Serviços mudou minha vida. Tenho muito mais clientes e uma renda muito mais estável. A plataforma é fantástica!"
+      text: "Me pré-cadastrei e já estou ansioso para começar. A proposta da Click Serviços é exatamente o que o mercado precisava!"
     },
     {
       name: "Ana Costa",
-      role: "Cliente",
-      avatar: "/lovable-uploads/af549c20-f0ff-4bc0-9c4e-5440a094d9eb.png",
+      role: "Testadora Beta",
+      avatar: reviewPerson3,
       rating: 5,
-      text: "A facilidade de encontrar profissionais qualificados é incrível. Já usei para limpeza, jardinagem e técnico de TI. Todos excelentes!"
+      text: "A facilidade de navegação e a proposta de conectar clientes a profissionais verificados me conquistou. Mal posso esperar!"
     },
     {
       name: "Carlos Oliveira",
-      role: "Técnico em TI",
-      avatar: "/lovable-uploads/a8412fbe-533c-4921-9230-a96f6802f2d6.png",
+      role: "Profissional Pré-cadastrado",
+      avatar: reviewPerson4,
       rating: 5,
-      text: "Plataforma séria e confiável. Os pagamentos são sempre em dia e o suporte é excelente. Recomendo para todos os profissionais!"
+      text: "Plataforma com muito potencial. A ideia de ter um perfil profissional e receber clientes diretamente é fantástica!"
     }
   ];
 
@@ -50,12 +54,12 @@ export const TestimonialsSection = () => {
 
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
             O que nossos{" "}
-            <span className="text-primary">clientes e profissionais</span>{" "}
+            <span className="text-primary">testadores e profissionais</span>{" "}
             estão dizendo
           </h2>
 
           <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-            Mais de 50.000 pessoas já transformaram a forma como contratam e prestam serviços.
+            Pessoas que já testaram a plataforma e profissionais pré-cadastrados compartilham suas impressões.
           </p>
         </motion.div>
 
@@ -104,10 +108,10 @@ export const TestimonialsSection = () => {
         >
           <div className="grid md:grid-cols-4 gap-8 text-center">
             {[
-              { stat: "4.9/5", label: "Avaliação média", showStars: true },
-              { stat: "50K+", label: "Serviços realizados" },
-              { stat: "5K+", label: "Profissionais ativos" },
-              { stat: "98%", label: "Satisfação do cliente" },
+              { stat: "4.9/5", label: "Avaliação dos testadores", showStars: true },
+              { stat: "+1k", label: "Profissionais pré-cadastrados" },
+              { stat: "+150", label: "Categorias de serviço" },
+              { stat: "99%", label: "Aprovação nos testes" },
             ].map((item, i) => (
               <motion.div key={i} whileHover={{ scale: 1.05 }}>
                 <div className="text-3xl lg:text-4xl font-bold text-primary mb-2">{item.stat}</div>

@@ -10,6 +10,12 @@ const partners = [
   { name: "Vidraçaria Agmar", logo: "/lovable-uploads/partner-6.jpeg" },
   { name: "3M Metalúrgica", logo: "/lovable-uploads/partner-7.jpeg" },
   { name: "Lucas Polimento e Estética", logo: "/lovable-uploads/partner-8.jpeg" },
+  { name: "TV Quirinópolis", logo: "/lovable-uploads/partner-9.jpeg" },
+  { name: "Zaltran Supermercado", logo: "/lovable-uploads/partner-10.jpeg" },
+  { name: "Brasil Materiais", logo: "/lovable-uploads/partner-11.jpeg" },
+  { name: "Sarah Cris", logo: "/lovable-uploads/partner-12.jpeg" },
+  { name: "Casa das Bombas", logo: "/lovable-uploads/partner-13.jpeg" },
+  { name: "LA Construções", logo: "/lovable-uploads/partner-14.jpeg" },
 ];
 
 export const PartnersSection = () => {
@@ -35,7 +41,7 @@ export const PartnersSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 lg:gap-8">
           {partners.map((partner, i) => (
             <motion.div
               key={partner.name}
@@ -43,7 +49,7 @@ export const PartnersSection = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.4 }}
+              transition={{ delay: i * 0.05, duration: 0.4 }}
               whileHover={{ scale: 1.05, y: -4 }}
             >
               <img
