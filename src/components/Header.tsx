@@ -77,7 +77,7 @@ export const Header = () => {
                 variant="outline"
                 size="lg"
                 className="border-2 border-primary/20 hover:border-primary hover:bg-primary/5 btn-liquid"
-                onClick={() => scrollToSection("contratar")}
+                onClick={() => navigate("/em-breve")}
               >
                 Quero contratar
               </Button>
