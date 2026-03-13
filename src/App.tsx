@@ -20,6 +20,8 @@ import AdminPayments from "./pages/admin/AdminPayments";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminContacts from "./pages/admin/AdminContacts";
 import NotFound from "./pages/NotFound";
+import TermsOfUse from "./pages/TermsOfUse";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 const queryClient = new QueryClient();
 
