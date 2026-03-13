@@ -117,8 +117,7 @@ const calculateTimeLeft = (target: Date) => {
 
 const ComingSoon = () => {
   const navigate = useNavigate();
-  const [targetDate] = useState(getTargetDate);
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(targetDate));
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(LAUNCH_DATE));
 
   useEffect(() => {
     const interval = setInterval(() => {
