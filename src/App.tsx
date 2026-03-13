@@ -39,6 +39,8 @@ const App = () => (
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pagamento-erro" element={<PaymentError />} />
             <Route path="/em-breve" element={<ComingSoon />} />
+            <Route path="/termos-de-uso" element={<TermsOfUse />} />
+            <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
             <Route
               path="/dashboard"
               element={

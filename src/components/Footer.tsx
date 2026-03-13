@@ -102,6 +102,10 @@ export const Footer = () => {
         <div className="border-t border-white/10 py-6 lg:py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 lg:gap-4">
             <div className="text-white/70 text-xs lg:text-sm">© 2025 Click Serviços, Inc. Todos os direitos reservados.</div>
+            <div className="flex items-center gap-2 text-white/70 text-xs lg:text-sm">
+              <Shield className="w-4 h-4 text-primary" />
+              <span>Em conformidade com a LGPD</span>
+            </div>
             <div className="text-white/70 text-xs lg:text-sm">
               Powered By{" "}
               <a 
