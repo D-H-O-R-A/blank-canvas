@@ -3,6 +3,8 @@ import { Navigate } from "react-router-dom";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
+const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
+
 export const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [status, setStatus] = useState<"loading" | "admin" | "denied">("loading");
 
@@ -13,8 +15,16 @@ export const AdminProtectedRoute = ({ children }: { children: React.ReactNode })
         return;
       }
       try {
-        const result = await user.getIdTokenResult(true);
-        setStatus(result.claims.admin === true ? "admin" : "denied");
+        const token = await user.getIdToken(true);
+        const res = await fetch(`${API_BASE}/admin/check`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setStatus(data.isAdmin === true ? "admin" : "denied");
+        } else {
+          setStatus("denied");
+        }
       } catch {
         setStatus("denied");
       }

@@ -55,10 +55,11 @@ Após o deploy, a URL será:
 | PUT | `/profile` | Atualiza perfil |
 | POST | `/create-payment` | Gera novo link de pagamento |
 
-#### Admin (Bearer JWT + claim `admin: true`)
+#### Admin (Bearer JWT + documento admin/{uid} no Firestore)
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
+| GET | `/admin/check` | Verifica se o usuário é admin |
 | GET | `/admin/stats` | Contadores gerais (usuários, pagamentos, contatos, logs) |
 | GET | `/admin/users` | Lista todos os profissionais |
 | POST | `/admin/users` | Cria novo profissional (admin) |
@@ -70,26 +71,48 @@ Após o deploy, a URL será:
 
 ## 5. Definir um usuário como Admin
 
-Use o Firebase CLI para definir custom claims:
+O admin é verificado via documento no Firestore na collection `admin/{uid}` com o campo `isAdmin: true`.
 
-```bash
-# Primeiro, encontre o UID do usuário no Firebase Console → Authentication
-# Depois, execute no terminal:
-node -e "
+### Via Firebase Console:
+
+1. Acesse **Firebase Console** → **Firestore Database**
+2. Crie a collection `admin` (se não existir)
+3. Adicione um documento com **Document ID = UID do usuário**
+4. Adicione o campo `isAdmin` (boolean) = `true`
+
+### Via script Node.js:
+
+```javascript
 const admin = require('firebase-admin');
 admin.initializeApp();
-admin.auth().setCustomUserClaims('UID_DO_USUARIO', { admin: true })
-  .then(() => console.log('Admin claim definido!'))
-  .catch(console.error);
-"
+const db = admin.firestore();
+
+// Substitua pelo UID do usuário
+await db.collection('admin').doc('UID_DO_USUARIO').set({ isAdmin: true });
+console.log('Admin definido!');
 ```
 
-Ou via Firebase Admin SDK em qualquer ambiente:
-```javascript
-await admin.auth().setCustomUserClaims(uid, { admin: true });
+> **Importante:** Toda leitura/escrita do Firestore é feita exclusivamente pelo backend (firebase-admin). As Security Rules do Firestore estão configuradas como deny-all.
+
+## 5.1 Firestore Security Rules
+
+As regras do Firestore devem bloquear todo acesso direto do client. Toda operação passa pela API Functions (firebase-admin bypassa as rules).
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
 ```
 
-> **Importante:** O usuário precisa fazer logout e login novamente para que o novo claim seja aplicado.
+Deploy das rules:
+```bash
+firebase deploy --only firestore:rules
+```
 
 ## 6. Configurar o Webhook no Mercado Pago
 

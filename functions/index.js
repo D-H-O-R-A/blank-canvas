@@ -89,14 +89,20 @@ async function requireAuth(req, res, next) {
 }
 
 /**
- * Middleware: Verifica se o usuário autenticado possui custom claim admin=true.
+ * Middleware: Verifica se o usuário autenticado é admin.
+ * Consulta o documento admin/{uid} no Firestore — campo isAdmin deve ser true.
  * Deve ser usado APÓS requireAuth.
  */
 async function requireAdmin(req, res, next) {
-  if (req.decodedToken?.admin !== true) {
-    return res.status(403).json({ error: "Acesso restrito a administradores" });
+  try {
+    const doc = await db.collection("admin").doc(req.uid).get();
+    if (!doc.exists || doc.data().isAdmin !== true) {
+      return res.status(403).json({ error: "Acesso restrito a administradores" });
+    }
+    next();
+  } catch {
+    return res.status(403).json({ error: "Erro ao verificar permissões" });
   }
-  next();
 }
 
 /**
@@ -425,8 +431,26 @@ app.post("/create-payment", requireAuth, async (req, res) => {
 });
 
 // =========================================================================
-// 5. ENDPOINTS ADMIN (JWT + claim admin=true)
+// 5. ENDPOINTS ADMIN (JWT + documento admin/{uid} no Firestore)
 // =========================================================================
+
+/**
+ * GET /admin/check
+ * Verifica se o usuário autenticado é admin.
+ * Consulta admin/{uid}.isAdmin no Firestore.
+ *
+ * @header Authorization: Bearer <JWT>
+ * @returns {object} { isAdmin: boolean }
+ */
+app.get("/admin/check", requireAuth, async (req, res) => {
+  try {
+    const doc = await db.collection("admin").doc(req.uid).get();
+    return res.status(200).json({ isAdmin: doc.exists && doc.data().isAdmin === true });
+  } catch (error) {
+    console.error("admin/check error:", error);
+    return res.status(500).json({ isAdmin: false });
+  }
+});
 
 /**
  * GET /admin/stats
