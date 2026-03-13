@@ -63,13 +63,13 @@ export const Footer = () => {
               <h3 className="text-base lg:text-lg font-semibold mb-4 lg:mb-6">Links Rápidos</h3>
               <ul className="space-y-3 lg:space-y-4">
                 {[
-                  { label: "Início", href: "#inicio" },
-                  { label: "Sobre", href: "#sobre" },
-                  { label: "Como funciona", href: "#como-funciona" },
-                  { label: "Contato", href: "/contato" },
+                  { label: "Início", to: "/#inicio" },
+                  { label: "Sobre", to: "/#sobre" },
+                  { label: "Como funciona", to: "/#como-funciona" },
+                  { label: "Contato", to: "/contato" },
                 ].map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{link.label}</a>
+                    <Link to={link.to} className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{link.label}</Link>
                   </li>
                 ))}
               </ul>
