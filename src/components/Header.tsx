@@ -54,20 +54,28 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            {["inicio", "sobre", "como-funciona", "seja-profissional", "contato"].map((section) => (
+            {[
+              { id: "inicio", label: "Início" },
+              { id: "sobre", label: "Sobre" },
+              { id: "como-funciona", label: "Como funciona" },
+              { id: "seja-profissional", label: "Seja um Pro" },
+            ].map((section) => (
               <button
-                key={section}
-                onClick={() => scrollToSection(section)}
+                key={section.id}
+                onClick={() => scrollToSection(section.id)}
                 className="relative text-foreground hover:text-primary transition-all duration-300 font-medium text-lg group"
               >
-                {section === "inicio" && "Início"}
-                {section === "sobre" && "Sobre"}
-                {section === "como-funciona" && "Como funciona"}
-                {section === "seja-profissional" && "Seja um Pro"}
-                {section === "contato" && "Contato"}
+                {section.label}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-emerald transition-all duration-300 group-hover:w-full"></span>
               </button>
             ))}
+            <button
+              onClick={() => navigate("/contato")}
+              className="relative text-foreground hover:text-primary transition-all duration-300 font-medium text-lg group"
+            >
+              Contato
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-emerald transition-all duration-300 group-hover:w-full"></span>
+            </button>
           </nav>
 
           {/* CTA Buttons */}
@@ -117,19 +125,26 @@ export const Header = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              {["inicio", "sobre", "como-funciona", "seja-profissional", "contato"].map((section) => (
+              {[
+                { id: "inicio", label: "Início" },
+                { id: "sobre", label: "Sobre" },
+                { id: "como-funciona", label: "Como funciona" },
+                { id: "seja-profissional", label: "Seja um Pro" },
+              ].map((section) => (
                 <button
-                  key={section}
-                  onClick={() => scrollToSection(section)}
+                  key={section.id}
+                  onClick={() => scrollToSection(section.id)}
                   className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors duration-300 font-medium text-lg"
                 >
-                  {section === "inicio" && "Início"}
-                  {section === "sobre" && "Sobre"}
-                  {section === "como-funciona" && "Como funciona"}
-                  {section === "seja-profissional" && "Seja um Pro"}
-                  {section === "contato" && "Contato"}
+                  {section.label}
                 </button>
               ))}
+              <button
+                onClick={() => { navigate("/contato"); setIsMobileMenuOpen(false); }}
+                className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors duration-300 font-medium text-lg"
+              >
+                Contato
+              </button>
               <div className="flex flex-col space-y-4 pt-6 border-t border-primary/10">
                 <Button
                   variant="outline"

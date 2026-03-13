@@ -58,7 +58,7 @@ export const Footer = () => {
                   { label: "Início", href: "#inicio" },
                   { label: "Sobre", href: "#sobre" },
                   { label: "Como funciona", href: "#como-funciona" },
-                  { label: "Contato", href: "#contato" },
+                  { label: "Contato", href: "/contato" },
                 ].map((link) => (
                   <li key={link.label}>
                     <a href={link.href} className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{link.label}</a>

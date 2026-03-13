@@ -99,12 +99,7 @@ function Scene() {
 
 // ==================== Countdown Logic ====================
 
-const getTargetDate = () => {
-  const now = new Date();
-  const target = new Date(now);
-  target.setMonth(target.getMonth() + 2);
-  return target;
-};
+const LAUNCH_DATE = new Date("2026-06-01T00:00:00");
 
 const calculateTimeLeft = (target: Date) => {
   const now = new Date();
@@ -122,15 +117,14 @@ const calculateTimeLeft = (target: Date) => {
 
 const ComingSoon = () => {
   const navigate = useNavigate();
-  const [targetDate] = useState(getTargetDate);
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(targetDate));
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft(LAUNCH_DATE));
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(targetDate));
+      setTimeLeft(calculateTimeLeft(LAUNCH_DATE));
     }, 1000);
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, []);
 
   const timeUnits = [
     { value: timeLeft.days, label: "Dias" },

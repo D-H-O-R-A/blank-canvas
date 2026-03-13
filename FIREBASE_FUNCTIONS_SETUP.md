@@ -18,7 +18,7 @@
 ## 2. Configurar as credenciais no Firebase
 
 ```bash
-firebase functions:config:set mercadopago.access_token="APP_USR-xxxx-xxxx"
+firebase functions:secrets:set MERCADOPAGO_ACCESS_TOKEN
 ```
 
 ## 3. Fazer deploy das funções
@@ -39,22 +39,66 @@ Após o deploy, a URL será:
 
 ### Endpoints disponíveis:
 
-| Método | Rota | Auth | Descrição |
-|--------|------|------|-----------|
-| POST | `/register` | Público | Cria usuário + assinatura MP |
-| POST | `/webhook/mercadopago` | Público | Webhook do Mercado Pago |
-| GET | `/profile` | Bearer JWT | Retorna perfil do profissional |
-| PUT | `/profile` | Bearer JWT | Atualiza perfil |
-| POST | `/create-payment` | Bearer JWT | Gera novo link de pagamento |
+#### Públicos (sem autenticação)
 
-## 5. Configurar o Webhook no Mercado Pago
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| POST | `/register` | Cria usuário + assinatura MP |
+| POST | `/contact` | Salva formulário de contato |
+| POST | `/webhook/mercadopago` | Webhook do Mercado Pago |
+
+#### Protegidos (Bearer JWT)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/profile` | Retorna perfil do profissional |
+| PUT | `/profile` | Atualiza perfil |
+| POST | `/create-payment` | Gera novo link de pagamento |
+
+#### Admin (Bearer JWT + claim `admin: true`)
+
+| Método | Rota | Descrição |
+|--------|------|-----------|
+| GET | `/admin/stats` | Contadores gerais (usuários, pagamentos, contatos, logs) |
+| GET | `/admin/users` | Lista todos os profissionais |
+| POST | `/admin/users` | Cria novo profissional (admin) |
+| PUT | `/admin/users/:uid` | Edita dados de qualquer profissional |
+| GET | `/admin/payments` | Lista todos os pagamentos |
+| GET | `/admin/logs` | Lista logs internos (últimos 500) |
+| GET | `/admin/contacts` | Lista formulários de contato |
+| PUT | `/admin/contacts/:id` | Marca contato como lido |
+
+## 5. Definir um usuário como Admin
+
+Use o Firebase CLI para definir custom claims:
+
+```bash
+# Primeiro, encontre o UID do usuário no Firebase Console → Authentication
+# Depois, execute no terminal:
+node -e "
+const admin = require('firebase-admin');
+admin.initializeApp();
+admin.auth().setCustomUserClaims('UID_DO_USUARIO', { admin: true })
+  .then(() => console.log('Admin claim definido!'))
+  .catch(console.error);
+"
+```
+
+Ou via Firebase Admin SDK em qualquer ambiente:
+```javascript
+await admin.auth().setCustomUserClaims(uid, { admin: true });
+```
+
+> **Importante:** O usuário precisa fazer logout e login novamente para que o novo claim seja aplicado.
+
+## 6. Configurar o Webhook no Mercado Pago
 
 1. Acesse: https://www.mercadopago.com.br/developers/panel/app
 2. Na seção **Webhooks**, configure:
    - **URL**: `https://us-central1-click-servico.cloudfunctions.net/api/webhook/mercadopago`
    - **Eventos**: `subscription_preapproval`
 
-## 6. Firestore - Estrutura dos dados
+## 7. Firestore - Estrutura dos dados
 
 ```
 professionals/{uid}
@@ -63,7 +107,7 @@ professionals/{uid}
 ├── whatsapp: string
 ├── profession: string
 ├── plan: "1 mês" | "6 meses"
-├── subscriptionStatus: "pending" | "active"
+├── subscriptionStatus: "pending" | "active" | "cancelled"
 ├── paidUntil: string (ISO date)
 ├── about: string
 ├── socialLinks: { instagram, facebook, linkedin, website }
@@ -77,9 +121,36 @@ professionals/{uid}
         ├── amount: number
         ├── paidAt: timestamp
         └── paidUntil: string
+
+contacts/{id}
+├── name: string
+├── email: string
+├── phone: string
+├── subject: string
+├── message: string
+├── createdAt: string (ISO date)
+└── read: boolean
+
+logs/{id}
+├── endpoint: string
+├── method: string ("POST" | "PUT")
+├── uid: string | null
+├── timestamp: string (ISO date)
+├── summary: string (body JSON truncado em 500 chars)
+└── ip: string
 ```
 
-## 7. Fluxo de cadastro
+## 8. Sistema de Logs
+
+Toda interação POST/PUT é automaticamente registrada na collection `logs` com:
+- Endpoint chamado
+- Método HTTP
+- UID do usuário (se autenticado)
+- Timestamp
+- Resumo do body (primeiros 500 chars)
+- IP de origem
+
+## 9. Fluxo de cadastro
 
 1. Profissional preenche formulário no site
 2. Frontend valida os dados
@@ -92,9 +163,20 @@ professionals/{uid}
 9. Após pagamento, MP redireciona para `/pagamento-sucesso` ou `/pagamento-erro`
 10. Webhook do MP atualiza status no Firestore
 
-## 8. Testar localmente
+## 10. Testar localmente
 
 ```bash
 cd functions
 npm run serve
 ```
+
+## 11. Painel Admin
+
+Acesse `/admin` no app (requer login com conta que tenha claim `admin: true`).
+
+Funcionalidades:
+- **Dashboard**: Visão geral com contadores
+- **Usuários**: Criar, listar e editar profissionais
+- **Pagamentos**: Visualizar histórico de pagamentos
+- **Logs**: Acompanhar todas as interações POST/PUT
+- **Contatos**: Gerenciar formulários de contato recebidos
