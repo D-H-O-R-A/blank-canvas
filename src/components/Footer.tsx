@@ -24,11 +24,11 @@ export const Footer = () => {
   };
 
   const trustSeals = [
-    { src: sealLgpd, alt: "LGPD - Lei Geral de Proteção de Dados", url: "https://www.gov.br/cidadania/pt-br/acesso-a-informacao/lgpd" },
-    { src: sealSsl, alt: "SSL - Conexão Segura", url: "https://www.ssl.com/pt/faqs/o-que-e-um-certificado-ssl/" },
-    { src: sealSafeBrowsing, alt: "Google Safe Browsing", url: "https://safebrowsing.google.com/" },
-    { src: sealVerified, alt: "Profissionais Verificados", url: "https://support.google.com/business/answer/7107242" },
-    { src: sealPayment, alt: "Pagamento Seguro", url: "https://www.pci-dss-guide.com/pci-dss-guide/" },
+    { src: sealLgpd, alt: "LGPD - Lei Geral de Proteção de Dados" },
+    { src: sealSsl, alt: "SSL - Conexão Segura" },
+    { src: sealSafeBrowsing, alt: "Google Safe Browsing" },
+    { src: sealVerified, alt: "Profissionais Verificados" },
+    { src: sealPayment, alt: "Pagamento Seguro" },
   ];
 
   return (
