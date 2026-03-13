@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle, Shield } from "lucide-react";
+import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -17,6 +17,14 @@ export const Footer = () => {
     console.log("Newsletter signup:", email);
     setEmail("");
   };
+
+  const trustBadges = [
+    { icon: Star, label: "Site bem avaliado" },
+    { icon: Shield, label: "LGPD" },
+    { icon: Lock, label: "Pagamento seguro" },
+    { icon: BadgeCheck, label: "Profissionais verificados" },
+    { icon: ShieldCheck, label: "Dados protegidos" },
+  ];
 
   return (
     <footer className="bg-navy text-white relative overflow-hidden">
@@ -79,7 +87,7 @@ export const Footer = () => {
                   <Link to="/politica-de-privacidade" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Política de Privacidade</Link>
                 </li>
                 <li>
-                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Cookies</a>
+                  <Link to="/politica-de-cookies" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Política de Cookies</Link>
                 </li>
               </ul>
             </div>
@@ -95,6 +103,18 @@ export const Footer = () => {
                 <Button type="submit" variant="hero" className="whitespace-nowrap">Inscrever-se</Button>
               </form>
             </div>
+          </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="border-t border-white/10 py-6">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8">
+            {trustBadges.map(({ icon: Icon, label }) => (
+              <div key={label} className="flex items-center gap-1.5 text-white/60 text-xs sm:text-sm">
+                <Icon className="w-4 h-4 text-primary" />
+                <span>{label}</span>
+              </div>
+            ))}
           </div>
         </div>
 
