@@ -121,10 +121,10 @@ const ComingSoon = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setTimeLeft(calculateTimeLeft(targetDate));
+      setTimeLeft(calculateTimeLeft(LAUNCH_DATE));
     }, 1000);
     return () => clearInterval(interval);
-  }, [targetDate]);
+  }, []);
 
   const timeUnits = [
     { value: timeLeft.days, label: "Dias" },
