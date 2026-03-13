@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ArrowUp, Instagram, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
