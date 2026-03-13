@@ -125,19 +125,26 @@ export const Header = () => {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
             >
-              {["inicio", "sobre", "como-funciona", "seja-profissional", "contato"].map((section) => (
+              {[
+                { id: "inicio", label: "Início" },
+                { id: "sobre", label: "Sobre" },
+                { id: "como-funciona", label: "Como funciona" },
+                { id: "seja-profissional", label: "Seja um Pro" },
+              ].map((section) => (
                 <button
-                  key={section}
-                  onClick={() => scrollToSection(section)}
+                  key={section.id}
+                  onClick={() => scrollToSection(section.id)}
                   className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors duration-300 font-medium text-lg"
                 >
-                  {section === "inicio" && "Início"}
-                  {section === "sobre" && "Sobre"}
-                  {section === "como-funciona" && "Como funciona"}
-                  {section === "seja-profissional" && "Seja um Pro"}
-                  {section === "contato" && "Contato"}
+                  {section.label}
                 </button>
               ))}
+              <button
+                onClick={() => { navigate("/contato"); setIsMobileMenuOpen(false); }}
+                className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors duration-300 font-medium text-lg"
+              >
+                Contato
+              </button>
               <div className="flex flex-col space-y-4 pt-6 border-t border-primary/10">
                 <Button
                   variant="outline"
