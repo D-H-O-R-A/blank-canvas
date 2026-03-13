@@ -54,20 +54,28 @@ export const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-8">
-            {["inicio", "sobre", "como-funciona", "seja-profissional", "contato"].map((section) => (
+            {[
+              { id: "inicio", label: "Início" },
+              { id: "sobre", label: "Sobre" },
+              { id: "como-funciona", label: "Como funciona" },
+              { id: "seja-profissional", label: "Seja um Pro" },
+            ].map((section) => (
               <button
-                key={section}
-                onClick={() => scrollToSection(section)}
+                key={section.id}
+                onClick={() => scrollToSection(section.id)}
                 className="relative text-foreground hover:text-primary transition-all duration-300 font-medium text-lg group"
               >
-                {section === "inicio" && "Início"}
-                {section === "sobre" && "Sobre"}
-                {section === "como-funciona" && "Como funciona"}
-                {section === "seja-profissional" && "Seja um Pro"}
-                {section === "contato" && "Contato"}
+                {section.label}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-emerald transition-all duration-300 group-hover:w-full"></span>
               </button>
             ))}
+            <button
+              onClick={() => navigate("/contato")}
+              className="relative text-foreground hover:text-primary transition-all duration-300 font-medium text-lg group"
+            >
+              Contato
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-emerald transition-all duration-300 group-hover:w-full"></span>
+            </button>
           </nav>
 
           {/* CTA Buttons */}
