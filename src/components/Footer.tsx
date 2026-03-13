@@ -2,8 +2,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Instagram, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ArrowUp, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
+import sealLgpd from "@/assets/seal-lgpd.png";
+import sealSsl from "@/assets/seal-ssl.png";
+import sealSafeBrowsing from "@/assets/seal-safe-browsing.png";
+import sealVerified from "@/assets/seal-verified.png";
+import sealPayment from "@/assets/seal-payment.png";
 
 export const Footer = () => {
   const [email, setEmail] = useState("");
