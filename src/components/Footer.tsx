@@ -24,11 +24,11 @@ export const Footer = () => {
   };
 
   const trustSeals = [
-    { src: sealLgpd, alt: "LGPD - Lei Geral de Proteção de Dados", url: "https://www.gov.br/cidadania/pt-br/acesso-a-informacao/lgpd" },
-    { src: sealSsl, alt: "SSL - Conexão Segura", url: "https://www.ssl.com/pt/faqs/o-que-e-um-certificado-ssl/" },
-    { src: sealSafeBrowsing, alt: "Google Safe Browsing", url: "https://safebrowsing.google.com/" },
-    { src: sealVerified, alt: "Profissionais Verificados", url: "https://support.google.com/business/answer/7107242" },
-    { src: sealPayment, alt: "Pagamento Seguro", url: "https://www.pci-dss-guide.com/pci-dss-guide/" },
+    { src: sealLgpd, alt: "LGPD - Lei Geral de Proteção de Dados" },
+    { src: sealSsl, alt: "SSL - Conexão Segura" },
+    { src: sealSafeBrowsing, alt: "Google Safe Browsing" },
+    { src: sealVerified, alt: "Profissionais Verificados" },
+    { src: sealPayment, alt: "Pagamento Seguro" },
   ];
 
   return (
@@ -113,10 +113,8 @@ export const Footer = () => {
         {/* Trust Seals */}
         <div className="border-t border-white/10 py-6 lg:py-8">
           <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 lg:gap-10">
-            {trustSeals.map(({ src, alt, url }) => (
-              <a key={alt} href={url} target="_blank" rel="noopener noreferrer" title={alt}>
-                <img src={src} alt={alt} className="h-12 sm:h-14 lg:h-16 w-auto object-contain opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300" />
-              </a>
+            {trustSeals.map(({ src, alt }) => (
+              <img key={alt} src={src} alt={alt} title={alt} className="h-12 sm:h-14 lg:h-16 w-auto object-contain opacity-90" />
             ))}
           </div>
         </div>
