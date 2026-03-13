@@ -431,8 +431,26 @@ app.post("/create-payment", requireAuth, async (req, res) => {
 });
 
 // =========================================================================
-// 5. ENDPOINTS ADMIN (JWT + claim admin=true)
+// 5. ENDPOINTS ADMIN (JWT + documento admin/{uid} no Firestore)
 // =========================================================================
+
+/**
+ * GET /admin/check
+ * Verifica se o usuário autenticado é admin.
+ * Consulta admin/{uid}.isAdmin no Firestore.
+ *
+ * @header Authorization: Bearer <JWT>
+ * @returns {object} { isAdmin: boolean }
+ */
+app.get("/admin/check", requireAuth, async (req, res) => {
+  try {
+    const doc = await db.collection("admin").doc(req.uid).get();
+    return res.status(200).json({ isAdmin: doc.exists && doc.data().isAdmin === true });
+  } catch (error) {
+    console.error("admin/check error:", error);
+    return res.status(500).json({ isAdmin: false });
+  }
+});
 
 /**
  * GET /admin/stats
