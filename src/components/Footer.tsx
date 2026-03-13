@@ -23,12 +23,12 @@ export const Footer = () => {
     setEmail("");
   };
 
-  const trustBadges = [
-    { icon: Star, label: "Site bem avaliado" },
-    { icon: Shield, label: "LGPD" },
-    { icon: Lock, label: "Pagamento seguro" },
-    { icon: BadgeCheck, label: "Profissionais verificados" },
-    { icon: ShieldCheck, label: "Dados protegidos" },
+  const trustSeals = [
+    { src: sealLgpd, alt: "LGPD - Lei Geral de Proteção de Dados" },
+    { src: sealSsl, alt: "SSL - Conexão Segura" },
+    { src: sealSafeBrowsing, alt: "Google Safe Browsing" },
+    { src: sealVerified, alt: "Profissionais Verificados" },
+    { src: sealPayment, alt: "Pagamento Seguro" },
   ];
 
   return (
