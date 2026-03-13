@@ -134,7 +134,7 @@ export const Header = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => scrollToSection("contratar")}
+                  onClick={() => { navigate("/em-breve"); setIsMobileMenuOpen(false); }}
                   className="w-full border-2 border-primary/20 hover:border-primary"
                 >
                   Quero contratar
