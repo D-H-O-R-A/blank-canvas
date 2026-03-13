@@ -21,6 +21,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminContacts from "./pages/admin/AdminContacts";
+import AdminAdmins from "./pages/admin/AdminAdmins";
+import AdminLogin from "./pages/admin/AdminLogin";
 import NotFound from "./pages/NotFound";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
