@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 
