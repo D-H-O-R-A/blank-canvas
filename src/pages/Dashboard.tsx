@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
-const FUNCTIONS_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net";
+const API_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net/api";
 
 interface Profile {
   name: string;
@@ -51,7 +51,7 @@ const Dashboard = () => {
     if (!user) return;
     try {
       const token = await user.getIdToken();
-      const res = await fetch(`${FUNCTIONS_BASE_URL}/getProfile`, {
+      const res = await fetch(`${API_BASE_URL}/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -71,8 +71,8 @@ const Dashboard = () => {
     setSaving(true);
     try {
       const token = await user.getIdToken();
-      const res = await fetch(`${FUNCTIONS_BASE_URL}/updateProfile`, {
-        method: "POST",
+      const res = await fetch(`${API_BASE_URL}/profile`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ const Dashboard = () => {
     if (!user) return;
     try {
       const token = await user.getIdToken();
-      const res = await fetch(`${FUNCTIONS_BASE_URL}/createSubscription`, {
+      const res = await fetch(`${API_BASE_URL}/create-payment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +105,7 @@ const Dashboard = () => {
       });
       const data = await res.json();
       if (data.paymentUrl) {
-        window.open(data.paymentUrl, "_blank");
+        window.location.href = data.paymentUrl;
       }
     } catch {
       toast({ title: "Erro ao gerar pagamento", variant: "destructive" });

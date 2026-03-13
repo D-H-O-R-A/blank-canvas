@@ -31,20 +31,27 @@ cd ..
 firebase deploy --only functions
 ```
 
-## 4. URLs das funções (após deploy)
+## 4. URL da API (após deploy)
 
-Após o deploy, as URLs serão:
+Após o deploy, a URL será:
 
-- `https://us-central1-click-servico.cloudfunctions.net/createSubscription`
-- `https://us-central1-click-servico.cloudfunctions.net/mercadoPagoWebhook`
-- `https://us-central1-click-servico.cloudfunctions.net/getProfile`
-- `https://us-central1-click-servico.cloudfunctions.net/updateProfile`
+- `https://us-central1-click-servico.cloudfunctions.net/api`
+
+### Endpoints disponíveis:
+
+| Método | Rota | Auth | Descrição |
+|--------|------|------|-----------|
+| POST | `/register` | Público | Cria usuário + assinatura MP |
+| POST | `/webhook/mercadopago` | Público | Webhook do Mercado Pago |
+| GET | `/profile` | Bearer JWT | Retorna perfil do profissional |
+| PUT | `/profile` | Bearer JWT | Atualiza perfil |
+| POST | `/create-payment` | Bearer JWT | Gera novo link de pagamento |
 
 ## 5. Configurar o Webhook no Mercado Pago
 
 1. Acesse: https://www.mercadopago.com.br/developers/panel/app
 2. Na seção **Webhooks**, configure:
-   - **URL**: `https://us-central1-click-servico.cloudfunctions.net/mercadoPagoWebhook`
+   - **URL**: `https://us-central1-click-servico.cloudfunctions.net/api/webhook/mercadopago`
    - **Eventos**: `subscription_preapproval`
 
 ## 6. Firestore - Estrutura dos dados
@@ -72,11 +79,18 @@ professionals/{uid}
         └── paidUntil: string
 ```
 
-## 7. Modelo de cobrança
+## 7. Fluxo de cadastro
 
-- **Recorrência**: Cartão de crédito mensal via Mercado Pago Preapproval
-- **Cancelamento**: Manual (cliente deve entrar em contato)
-- **Monitoramento**: Verificar o campo `paidUntil` no Firestore para acompanhar vencimentos
+1. Profissional preenche formulário no site
+2. Frontend valida os dados
+3. Envia POST para `/api/register`
+4. Backend cria usuário no Firebase Auth
+5. Backend salva perfil no Firestore
+6. Backend cria assinatura no Mercado Pago
+7. Retorna `paymentUrl` para o frontend
+8. Frontend redireciona para o Mercado Pago
+9. Após pagamento, MP redireciona para `/pagamento-sucesso` ou `/pagamento-erro`
+10. Webhook do MP atualiza status no Firestore
 
 ## 8. Testar localmente
 
@@ -84,5 +98,3 @@ professionals/{uid}
 cd functions
 npm run serve
 ```
-
-Isso inicia o emulador do Firebase Functions localmente.

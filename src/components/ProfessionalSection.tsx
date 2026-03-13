@@ -6,22 +6,17 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, CreditCard, Zap, TrendingUp, Users, Award, CheckCircle, ArrowRight, Target, Eye, EyeOff } from "lucide-react";
+import { Star, CreditCard, Zap, TrendingUp, Users, Award, CheckCircle, ArrowRight, Target, Eye, EyeOff, Loader2 } from "lucide-react";
 import { PartnersSection } from "./PartnersSection";
-import { RegistrationSuccessDialog } from "./RegistrationSuccessDialog";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
-const FUNCTIONS_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net";
+const API_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net/api";
 
 export const ProfessionalSection = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
-  const [paymentUrl, setPaymentUrl] = useState("");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -78,35 +73,46 @@ export const ProfessionalSection = () => {
     },
   ];
 
+  const validateForm = (): boolean => {
+    if (!formData.name.trim()) {
+      toast({ title: "Informe seu nome completo", variant: "destructive" });
+      return false;
+    }
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      toast({ title: "Informe um e-mail válido", variant: "destructive" });
+      return false;
+    }
+    if (!formData.whatsapp.trim() || formData.whatsapp.replace(/\D/g, "").length < 10) {
+      toast({ title: "Informe um WhatsApp válido", variant: "destructive" });
+      return false;
+    }
+    if (!formData.password || formData.password.length < 6) {
+      toast({ title: "A senha deve ter pelo menos 6 caracteres", variant: "destructive" });
+      return false;
+    }
+    if (!formData.plan) {
+      toast({ title: "Escolha um plano", variant: "destructive" });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.password || !formData.plan || !formData.whatsapp) {
-      toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
-      return;
-    }
-    if (formData.password.length < 6) {
-      toast({ title: "A senha deve ter pelo menos 6 caracteres", variant: "destructive" });
-      return;
-    }
+    if (!validateForm()) return;
 
     setLoading(true);
     try {
-      // 1. Create Firebase Auth account
-      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      const token = await userCredential.user.getIdToken();
-
-      // 2. Call Cloud Function to create subscription
-      const response = await fetch(`${FUNCTIONS_BASE_URL}/createSubscription`, {
+      // Send to API - backend creates user + returns payment link
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          whatsapp: formData.whatsapp,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          whatsapp: formData.whatsapp.trim(),
           profession: formData.profession,
+          password: formData.password,
           plan: formData.plan,
         }),
       });
@@ -114,28 +120,36 @@ export const ProfessionalSection = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Erro ao criar assinatura");
+        if (data.code === "EMAIL_EXISTS") {
+          toast({
+            title: "Você já possui cadastro",
+            description: "Faça login para continuar.",
+          });
+          setIsModalOpen(false);
+          navigate("/login");
+          return;
+        }
+        throw new Error(data.error || "Erro ao realizar cadastro");
       }
 
-      // 3. Show success dialog with payment URL
-      setPaymentUrl(data.paymentUrl);
-      setIsModalOpen(false);
-      setSuccessDialogOpen(true);
-    } catch (error: any) {
-      if (error.code === "auth/email-already-in-use") {
-        toast({
-          title: "Você já possui cadastro",
-          description: "Faça login para continuar.",
-        });
+      // Redirect to payment URL
+      if (data.paymentUrl) {
         setIsModalOpen(false);
-        navigate("/login");
-      } else {
         toast({
-          title: "Erro no cadastro",
-          description: error.message || "Tente novamente mais tarde.",
-          variant: "destructive",
+          title: "Cadastro realizado!",
+          description: "Redirecionando para o pagamento...",
         });
+        // Small delay for user to see the toast
+        setTimeout(() => {
+          window.location.href = data.paymentUrl;
+        }, 1500);
       }
+    } catch (error: any) {
+      toast({
+        title: "Erro no cadastro",
+        description: error.message || "Tente novamente mais tarde.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -330,8 +344,17 @@ export const ProfessionalSection = () => {
                     className="w-full h-14 text-lg font-bold"
                     disabled={loading || !formData.name || !formData.email || !formData.password || !formData.plan}
                   >
-                    {loading ? "Cadastrando..." : "Finalizar Cadastro"}
-                    {!loading && <ArrowRight className="w-5 h-5 ml-2" />}
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Cadastrando...
+                      </>
+                    ) : (
+                      <>
+                        Finalizar Cadastro
+                        <ArrowRight className="w-5 h-5 ml-2" />
+                      </>
+                    )}
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center">
@@ -466,12 +489,6 @@ export const ProfessionalSection = () => {
           </motion.div>
         </div>
       </section>
-
-      <RegistrationSuccessDialog
-        open={successDialogOpen}
-        onOpenChange={setSuccessDialogOpen}
-        paymentUrl={paymentUrl}
-      />
     </>
   );
 };
