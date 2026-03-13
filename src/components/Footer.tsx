@@ -45,17 +45,16 @@ export const Footer = () => {
                 O futuro dos serviços está aqui.
               </p>
               <div className="flex gap-3 lg:gap-4">
-                {[Facebook, Instagram, Linkedin, MessageCircle].map((Icon, i) => (
-                  <motion.a
-                    key={i}
-                    href="#"
-                    className="w-9 h-9 lg:w-10 lg:h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary transition-colors duration-300"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
-                  </motion.a>
-                ))}
+                <motion.a
+                  href="https://www.instagram.com/click_servicos_app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 lg:w-10 lg:h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary transition-colors duration-300"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Instagram className="w-4 h-4 lg:w-5 lg:h-5" />
+                </motion.a>
               </div>
             </div>
 
