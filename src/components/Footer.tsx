@@ -2,7 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle } from "lucide-react";
+import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   const [email, setEmail] = useState("");
