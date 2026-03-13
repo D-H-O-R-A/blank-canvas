@@ -72,11 +72,15 @@ export const Footer = () => {
             <div>
               <h3 className="text-base lg:text-lg font-semibold mb-4 lg:mb-6">Legal</h3>
               <ul className="space-y-3 lg:space-y-4">
-                {["Termos de Uso", "Privacidade", "Cookies", "Sitemap"].map((name) => (
-                  <li key={name}>
-                    <a href="#" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{name}</a>
-                  </li>
-                ))}
+                <li>
+                  <Link to="/termos-de-uso" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Termos de Uso</Link>
+                </li>
+                <li>
+                  <Link to="/politica-de-privacidade" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Política de Privacidade</Link>
+                </li>
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Cookies</a>
+                </li>
               </ul>
             </div>
           </div>
