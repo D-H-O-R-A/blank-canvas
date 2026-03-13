@@ -89,14 +89,20 @@ async function requireAuth(req, res, next) {
 }
 
 /**
- * Middleware: Verifica se o usuário autenticado possui custom claim admin=true.
+ * Middleware: Verifica se o usuário autenticado é admin.
+ * Consulta o documento admin/{uid} no Firestore — campo isAdmin deve ser true.
  * Deve ser usado APÓS requireAuth.
  */
 async function requireAdmin(req, res, next) {
-  if (req.decodedToken?.admin !== true) {
-    return res.status(403).json({ error: "Acesso restrito a administradores" });
+  try {
+    const doc = await db.collection("admin").doc(req.uid).get();
+    if (!doc.exists || doc.data().isAdmin !== true) {
+      return res.status(403).json({ error: "Acesso restrito a administradores" });
+    }
+    next();
+  } catch {
+    return res.status(403).json({ error: "Erro ao verificar permissões" });
   }
-  next();
 }
 
 /**
