@@ -232,6 +232,62 @@ router.get("/admin/contacts", requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
+// ----- GET /admin/admins -----
+router.get("/admin/admins", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const snap = await db.collection("admin").where("isAdmin", "==", true).get();
+    const admins = [];
+    for (const doc of snap.docs) {
+      let email = "";
+      try {
+        const userRecord = await admin.auth().getUser(doc.id);
+        email = userRecord.email || "";
+      } catch { /* user may not exist */ }
+      admins.push({ uid: doc.id, email });
+    }
+    return res.status(200).json(admins);
+  } catch (error) {
+    console.error("admin/admins GET error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- POST /admin/admins -----
+router.post("/admin/admins", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "E-mail é obrigatório" });
+
+    let userRecord;
+    try {
+      userRecord = await admin.auth().getUserByEmail(email);
+    } catch {
+      return res.status(404).json({ error: "Usuário não encontrado com este e-mail" });
+    }
+
+    await db.collection("admin").doc(userRecord.uid).set({ isAdmin: true }, { merge: true });
+    return res.status(200).json({ ok: true, uid: userRecord.uid });
+  } catch (error) {
+    console.error("admin/admins POST error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- DELETE /admin/admins/:uid -----
+router.delete("/admin/admins/:uid", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    if (uid === req.uid) {
+      return res.status(400).json({ error: "Você não pode remover a si mesmo" });
+    }
+    await db.collection("admin").doc(uid).delete();
+    return res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error("admin/admins DELETE error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // ----- PUT /admin/contacts/:id -----
 router.put("/admin/contacts/:id", requireAuth, requireAdmin, async (req, res) => {
   try {

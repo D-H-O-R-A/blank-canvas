@@ -40,7 +40,7 @@ export const AdminProtectedRoute = ({ children }: { children: React.ReactNode })
     );
   }
 
-  if (status === "denied") return <Navigate to="/login" replace />;
+  if (status === "denied") return <Navigate to="/admin/login" replace />;
 
   return <>{children}</>;
 };

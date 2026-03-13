@@ -23,6 +23,7 @@ const NAV = [
   { title: "Pagamentos", url: "/admin/payments", icon: CreditCard },
   { title: "Logs", url: "/admin/logs", icon: ScrollText },
   { title: "Contatos", url: "/admin/contacts", icon: Mail },
+  { title: "Administradores", url: "/admin/admins", icon: Shield },
 ];
 
 function AdminSidebar() {
