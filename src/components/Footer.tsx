@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ArrowUp, Instagram, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export const Footer = () => {
@@ -45,17 +45,16 @@ export const Footer = () => {
                 O futuro dos serviços está aqui.
               </p>
               <div className="flex gap-3 lg:gap-4">
-                {[Facebook, Instagram, Linkedin, MessageCircle].map((Icon, i) => (
-                  <motion.a
-                    key={i}
-                    href="#"
-                    className="w-9 h-9 lg:w-10 lg:h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary transition-colors duration-300"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
-                  </motion.a>
-                ))}
+                <motion.a
+                  href="https://www.instagram.com/click_servicos_app"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-9 h-9 lg:w-10 lg:h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-primary transition-colors duration-300"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Instagram className="w-4 h-4 lg:w-5 lg:h-5" />
+                </motion.a>
               </div>
             </div>
 
@@ -64,13 +63,13 @@ export const Footer = () => {
               <h3 className="text-base lg:text-lg font-semibold mb-4 lg:mb-6">Links Rápidos</h3>
               <ul className="space-y-3 lg:space-y-4">
                 {[
-                  { label: "Início", href: "#inicio" },
-                  { label: "Sobre", href: "#sobre" },
-                  { label: "Como funciona", href: "#como-funciona" },
-                  { label: "Contato", href: "/contato" },
+                  { label: "Início", to: "/#inicio" },
+                  { label: "Sobre", to: "/#sobre" },
+                  { label: "Como funciona", to: "/#como-funciona" },
+                  { label: "Contato", to: "/contato" },
                 ].map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{link.label}</a>
+                    <Link to={link.to} className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{link.label}</Link>
                   </li>
                 ))}
               </ul>
