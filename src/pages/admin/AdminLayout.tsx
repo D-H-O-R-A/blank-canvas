@@ -13,7 +13,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 
@@ -23,6 +23,7 @@ const NAV = [
   { title: "Pagamentos", url: "/admin/payments", icon: CreditCard },
   { title: "Logs", url: "/admin/logs", icon: ScrollText },
   { title: "Contatos", url: "/admin/contacts", icon: Mail },
+  { title: "Administradores", url: "/admin/admins", icon: Shield },
 ];
 
 function AdminSidebar() {

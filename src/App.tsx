@@ -21,6 +21,8 @@ import AdminUsers from "./pages/admin/AdminUsers";
 import AdminPayments from "./pages/admin/AdminPayments";
 import AdminLogs from "./pages/admin/AdminLogs";
 import AdminContacts from "./pages/admin/AdminContacts";
+import AdminAdmins from "./pages/admin/AdminAdmins";
+import AdminLogin from "./pages/admin/AdminLogin";
 import NotFound from "./pages/NotFound";
 import TermsOfUse from "./pages/TermsOfUse";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -39,6 +41,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/contato" element={<Contact />} />
             <Route path="/pagamento-sucesso" element={<PaymentSuccess />} />
             <Route path="/pagamento-erro" element={<PaymentError />} />
@@ -67,6 +70,7 @@ const App = () => (
               <Route path="payments" element={<AdminPayments />} />
               <Route path="logs" element={<AdminLogs />} />
               <Route path="contacts" element={<AdminContacts />} />
+              <Route path="admins" element={<AdminAdmins />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
