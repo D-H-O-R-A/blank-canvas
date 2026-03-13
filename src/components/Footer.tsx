@@ -2,7 +2,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle } from "lucide-react";
+import { ArrowUp, Facebook, Instagram, Linkedin, MessageCircle, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => {
   const [email, setEmail] = useState("");
@@ -71,11 +72,15 @@ export const Footer = () => {
             <div>
               <h3 className="text-base lg:text-lg font-semibold mb-4 lg:mb-6">Legal</h3>
               <ul className="space-y-3 lg:space-y-4">
-                {["Termos de Uso", "Privacidade", "Cookies", "Sitemap"].map((name) => (
-                  <li key={name}>
-                    <a href="#" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">{name}</a>
-                  </li>
-                ))}
+                <li>
+                  <Link to="/termos-de-uso" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Termos de Uso</Link>
+                </li>
+                <li>
+                  <Link to="/politica-de-privacidade" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Política de Privacidade</Link>
+                </li>
+                <li>
+                  <a href="#" className="text-white/70 hover:text-primary transition-colors duration-300 text-sm lg:text-base">Cookies</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -97,6 +102,10 @@ export const Footer = () => {
         <div className="border-t border-white/10 py-6 lg:py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 lg:gap-4">
             <div className="text-white/70 text-xs lg:text-sm">© 2025 Click Serviços, Inc. Todos os direitos reservados.</div>
+            <div className="flex items-center gap-2 text-white/70 text-xs lg:text-sm">
+              <Shield className="w-4 h-4 text-primary" />
+              <span>Em conformidade com a LGPD</span>
+            </div>
             <div className="text-white/70 text-xs lg:text-sm">
               Powered By{" "}
               <a 
