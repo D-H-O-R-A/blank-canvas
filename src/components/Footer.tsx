@@ -113,8 +113,10 @@ export const Footer = () => {
         {/* Trust Seals */}
         <div className="border-t border-white/10 py-6 lg:py-8">
           <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 lg:gap-10">
-            {trustSeals.map(({ src, alt }) => (
-              <img key={alt} src={src} alt={alt} className="h-12 sm:h-14 lg:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300" />
+            {trustSeals.map(({ src, alt, url }) => (
+              <a key={alt} href={url} target="_blank" rel="noopener noreferrer" title={alt}>
+                <img src={src} alt={alt} className="h-12 sm:h-14 lg:h-16 w-auto object-contain opacity-90 hover:opacity-100 hover:scale-105 transition-all duration-300" />
+              </a>
             ))}
           </div>
         </div>
