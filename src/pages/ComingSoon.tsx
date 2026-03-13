@@ -99,12 +99,7 @@ function Scene() {
 
 // ==================== Countdown Logic ====================
 
-const getTargetDate = () => {
-  const now = new Date();
-  const target = new Date(now);
-  target.setMonth(target.getMonth() + 2);
-  return target;
-};
+const LAUNCH_DATE = new Date("2026-06-01T00:00:00");
 
 const calculateTimeLeft = (target: Date) => {
   const now = new Date();
