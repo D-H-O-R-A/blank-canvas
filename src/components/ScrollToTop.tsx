@@ -7,10 +7,15 @@ export const ScrollToTop = () => {
   useEffect(() => {
     if (hash) {
       const id = hash.replace("#", "");
-      setTimeout(() => {
+      const scrollToEl = (attempts = 0) => {
         const el = document.getElementById(id);
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth" });
+        } else if (attempts < 10) {
+          setTimeout(() => scrollToEl(attempts + 1), 100);
+        }
+      };
+      scrollToEl();
     } else {
       window.scrollTo(0, 0);
     }
