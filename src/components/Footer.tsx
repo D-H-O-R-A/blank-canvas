@@ -2,8 +2,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowUp, Instagram, Shield, Star, Lock, BadgeCheck, ShieldCheck } from "lucide-react";
+import { ArrowUp, Instagram } from "lucide-react";
 import { Link } from "react-router-dom";
+import sealLgpd from "@/assets/seal-lgpd.png";
+import sealSsl from "@/assets/seal-ssl.png";
+import sealSafeBrowsing from "@/assets/seal-safe-browsing.png";
+import sealVerified from "@/assets/seal-verified.png";
+import sealPayment from "@/assets/seal-payment.png";
 
 export const Footer = () => {
   const [email, setEmail] = useState("");
@@ -18,12 +23,12 @@ export const Footer = () => {
     setEmail("");
   };
 
-  const trustBadges = [
-    { icon: Star, label: "Site bem avaliado" },
-    { icon: Shield, label: "LGPD" },
-    { icon: Lock, label: "Pagamento seguro" },
-    { icon: BadgeCheck, label: "Profissionais verificados" },
-    { icon: ShieldCheck, label: "Dados protegidos" },
+  const trustSeals = [
+    { src: sealLgpd, alt: "LGPD - Lei Geral de Proteção de Dados" },
+    { src: sealSsl, alt: "SSL - Conexão Segura" },
+    { src: sealSafeBrowsing, alt: "Google Safe Browsing" },
+    { src: sealVerified, alt: "Profissionais Verificados" },
+    { src: sealPayment, alt: "Pagamento Seguro" },
   ];
 
   return (
@@ -105,14 +110,11 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Trust Badges */}
-        <div className="border-t border-white/10 py-6">
-          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 lg:gap-8">
-            {trustBadges.map(({ icon: Icon, label }) => (
-              <div key={label} className="flex items-center gap-1.5 text-white/60 text-xs sm:text-sm">
-                <Icon className="w-4 h-4 text-primary" />
-                <span>{label}</span>
-              </div>
+        {/* Trust Seals */}
+        <div className="border-t border-white/10 py-6 lg:py-8">
+          <div className="flex flex-wrap justify-center items-center gap-6 sm:gap-8 lg:gap-10">
+            {trustSeals.map(({ src, alt }) => (
+              <img key={alt} src={src} alt={alt} className="h-12 sm:h-14 lg:h-16 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity duration-300" />
             ))}
           </div>
         </div>
@@ -121,10 +123,6 @@ export const Footer = () => {
         <div className="border-t border-white/10 py-6 lg:py-8">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 lg:gap-4">
             <div className="text-white/70 text-xs lg:text-sm">© 2025 Click Serviços, Inc. Todos os direitos reservados.</div>
-            <div className="flex items-center gap-2 text-white/70 text-xs lg:text-sm">
-              <Shield className="w-4 h-4 text-primary" />
-              <span>Em conformidade com a LGPD</span>
-            </div>
             <div className="text-white/70 text-xs lg:text-sm">
               Powered By{" "}
               <a 
