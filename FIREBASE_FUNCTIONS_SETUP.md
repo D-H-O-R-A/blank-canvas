@@ -55,10 +55,11 @@ Após o deploy, a URL será:
 | PUT | `/profile` | Atualiza perfil |
 | POST | `/create-payment` | Gera novo link de pagamento |
 
-#### Admin (Bearer JWT + claim `admin: true`)
+#### Admin (Bearer JWT + documento admin/{uid} no Firestore)
 
 | Método | Rota | Descrição |
 |--------|------|-----------|
+| GET | `/admin/check` | Verifica se o usuário é admin |
 | GET | `/admin/stats` | Contadores gerais (usuários, pagamentos, contatos, logs) |
 | GET | `/admin/users` | Lista todos os profissionais |
 | POST | `/admin/users` | Cria novo profissional (admin) |
