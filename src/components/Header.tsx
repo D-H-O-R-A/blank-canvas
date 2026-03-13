@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const Header = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -75,7 +77,7 @@ export const Header = () => {
                 variant="outline"
                 size="lg"
                 className="border-2 border-primary/20 hover:border-primary hover:bg-primary/5 btn-liquid"
-                onClick={() => scrollToSection("contratar")}
+                onClick={() => navigate("/em-breve")}
               >
                 Quero contratar
               </Button>
@@ -132,7 +134,7 @@ export const Header = () => {
                 <Button
                   variant="outline"
                   size="lg"
-                  onClick={() => scrollToSection("contratar")}
+                  onClick={() => { navigate("/em-breve"); setIsMobileMenuOpen(false); }}
                   className="w-full border-2 border-primary/20 hover:border-primary"
                 >
                   Quero contratar
