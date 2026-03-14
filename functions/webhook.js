@@ -160,6 +160,11 @@ async function handlePayment(dataId) {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
+    // Handle recruiter commission
+    if (pro.data.recruitedBy) {
+      await handleRecruiterCommission(pro.data.recruitedBy, pro.uid, payment.transaction_amount || 0);
+    }
+
     await logEvent("payment_approved", { dataId, email, uid: pro.uid, amount: payment.transaction_amount, paidUntil });
   } else {
     await db.collection("professionals").doc(pro.uid).collection("payments").add({
