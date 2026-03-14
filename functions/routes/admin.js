@@ -455,4 +455,188 @@ router.put("/admin/contacts/:id", requireAuth, requireAdmin, async (req, res) =>
   }
 });
 
+// ===================== RECRUITER ADMIN ENDPOINTS =====================
+
+// ----- GET /admin/recruiters -----
+router.get("/admin/recruiters", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const snap = await db.collection("recruiters").orderBy("createdAt", "desc").get();
+    const recruiters = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    return res.status(200).json(recruiters);
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- PUT /admin/recruiters/:uid -----
+router.put("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const allowed = ["name", "whatsapp", "profession", "address", "pixKey", "commissionPercent", "blocked"];
+    const updateData = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
+    for (const field of allowed) {
+      if (req.body[field] !== undefined) updateData[field] = req.body[field];
+    }
+    await db.collection("recruiters").doc(uid).update(updateData);
+    await logAdminAction(req, "recruiter_updated", { targetUid: uid, fields: Object.keys(updateData) });
+    return res.status(200).json({ ok: true });
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- DELETE /admin/recruiters/:uid -----
+router.delete("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    // Delete subcollections
+    const clientsSnap = await db.collection("recruiters").doc(uid).collection("clients").get();
+    const withdrawalsSnap = await db.collection("recruiters").doc(uid).collection("withdrawals").get();
+    const batch = db.batch();
+    clientsSnap.docs.forEach((doc) => batch.delete(doc.ref));
+    withdrawalsSnap.docs.forEach((doc) => batch.delete(doc.ref));
+    await batch.commit();
+    await db.collection("recruiters").doc(uid).delete();
+    try { await admin.auth().deleteUser(uid); } catch (e) { /* ignore */ }
+    await logAdminAction(req, "recruiter_deleted", { targetUid: uid });
+    return res.status(200).json({ ok: true });
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- PUT /admin/recruiters/:uid/block -----
+router.put("/admin/recruiters/:uid/block", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const doc = await db.collection("recruiters").doc(uid).get();
+    if (!doc.exists) return res.status(404).json({ error: "Recrutador não encontrado" });
+    const blocked = !doc.data().blocked;
+    await db.collection("recruiters").doc(uid).update({ blocked, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    await logAdminAction(req, blocked ? "recruiter_blocked" : "recruiter_unblocked", { targetUid: uid });
+    return res.status(200).json({ ok: true, blocked });
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- GET /admin/recruiters/:uid/clients -----
+router.get("/admin/recruiters/:uid/clients", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const snap = await db.collection("recruiters").doc(uid).collection("clients").orderBy("createdAt", "desc").get();
+    const clients = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    return res.status(200).json(clients);
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- POST /admin/recruiters/:uid/photo -----
+router.post("/admin/recruiters/:uid/photo", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { photo, contentType } = req.body;
+    if (!photo) return res.status(400).json({ error: "Foto não enviada" });
+
+    const bucket = admin.storage().bucket();
+    const ext = contentType === "image/png" ? "png" : "jpg";
+    const filePath = `recruiter-photos/${uid}.${ext}`;
+    const file = bucket.file(filePath);
+    const buffer = Buffer.from(photo, "base64");
+    await file.save(buffer, { metadata: { contentType: contentType || "image/jpeg" }, public: true });
+    const photoURL = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+    await admin.auth().updateUser(uid, { photoURL });
+    await db.collection("recruiters").doc(uid).update({ photoURL, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+
+    await logAdminAction(req, "recruiter_photo_updated", { targetUid: uid });
+    return res.status(200).json({ ok: true, photoURL });
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ===================== WITHDRAWAL ADMIN ENDPOINTS =====================
+
+// ----- GET /admin/withdrawals -----
+router.get("/admin/withdrawals", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const recruitersSnap = await db.collection("recruiters").get();
+    const withdrawals = [];
+    for (const rDoc of recruitersSnap.docs) {
+      const rData = rDoc.data();
+      const wSnap = await db.collection("recruiters").doc(rDoc.id).collection("withdrawals").orderBy("requestedAt", "desc").get();
+      for (const wDoc of wSnap.docs) {
+        withdrawals.push({
+          id: wDoc.id,
+          recruiterUid: rDoc.id,
+          recruiterName: rData.name,
+          recruiterEmail: rData.email,
+          recruiterPixKey: rData.pixKey,
+          ...wDoc.data(),
+        });
+      }
+    }
+    withdrawals.sort((a, b) => (b.requestedAt || "").localeCompare(a.requestedAt || ""));
+    return res.status(200).json(withdrawals);
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- PUT /admin/withdrawals/:recruiterUid/:id -----
+router.put("/admin/withdrawals/:recruiterUid/:id", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { recruiterUid, id } = req.params;
+    const { status, receipt, receiptContentType } = req.body;
+
+    if (!["approved", "rejected"].includes(status)) {
+      return res.status(400).json({ error: "Status inválido" });
+    }
+
+    const updateData = {
+      status,
+      processedAt: new Date().toISOString(),
+      processedBy: req.uid,
+    };
+
+    // Upload receipt if approving
+    if (status === "approved" && receipt) {
+      const bucket = admin.storage().bucket();
+      const ext = receiptContentType === "image/png" ? "png" : "jpg";
+      const filePath = `withdrawal-receipts/${recruiterUid}_${id}.${ext}`;
+      const file = bucket.file(filePath);
+      const buffer = Buffer.from(receipt, "base64");
+      await file.save(buffer, { metadata: { contentType: receiptContentType || "image/jpeg" }, public: true });
+      updateData.receiptURL = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+    }
+
+    await db.collection("recruiters").doc(recruiterUid).collection("withdrawals").doc(id).update(updateData);
+
+    // If rejected, refund the balance
+    if (status === "rejected") {
+      const wDoc = await db.collection("recruiters").doc(recruiterUid).collection("withdrawals").doc(id).get();
+      const amount = wDoc.data().amount || 0;
+      await db.collection("recruiters").doc(recruiterUid).update({
+        availableBalance: admin.firestore.FieldValue.increment(amount),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
+    await logAdminAction(req, `withdrawal_${status}`, { recruiterUid, withdrawalId: id });
+    return res.status(200).json({ ok: true });
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

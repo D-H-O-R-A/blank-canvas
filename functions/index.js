@@ -76,6 +76,7 @@ app.use(logAction);
 app.use(publicRoutes);
 app.use(profileRoutes);
 app.use(adminRoutes);
+app.use(recruiterRoutes);
 
 // Export como funções HTTP (2nd gen) com acesso ao secret do MP
 exports.api = onRequest({ secrets: [mercadoPagoToken] }, app);
