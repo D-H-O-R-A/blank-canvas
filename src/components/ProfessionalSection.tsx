@@ -27,6 +27,7 @@ export const ProfessionalSection = () => {
     profession: "",
     password: "",
     plan: "",
+    birthDate: "",
   });
 
   const benefits = [
@@ -119,6 +120,7 @@ export const ProfessionalSection = () => {
           profession: formData.profession,
           password: formData.password,
           plan: formData.plan,
+          birthDate: formData.birthDate || undefined,
         }),
       });
 
@@ -257,6 +259,14 @@ export const ProfessionalSection = () => {
                     <div className="space-y-2">
                       <Label htmlFor="profession">Profissão *</Label>
                       <Input id="profession" value={formData.profession} onChange={(e) => setFormData({ ...formData, profession: e.target.value })} placeholder="Ex: Eletricista, Encanador, Designer..." className="h-12" required />
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="birthDate">Data de nascimento</Label>
+                      <Input id="birthDate" type="date" value={formData.birthDate} onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })} className="h-12" />
                     </div>
                   </div>
 

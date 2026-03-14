@@ -1,34 +1,22 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import {
-  SidebarProvider,
-  SidebarTrigger,
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  useSidebar,
+  SidebarProvider, SidebarTrigger, Sidebar, SidebarContent,
+  SidebarGroup, SidebarGroupLabel, SidebarGroupContent,
+  SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield, UserCheck, Wallet } from "lucide-react";
+import { LayoutDashboard, Users, Wallet, User, LogOut } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 
 const NAV = [
-  { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
-  { title: "Usuários", url: "/admin/users", icon: Users },
-  { title: "Recrutadores", url: "/admin/recruiters", icon: UserCheck },
-  { title: "Saques", url: "/admin/withdrawals", icon: Wallet },
-  { title: "Pagamentos", url: "/admin/payments", icon: CreditCard },
-  { title: "Logs", url: "/admin/logs", icon: ScrollText },
-  { title: "Contatos", url: "/admin/contacts", icon: Mail },
-  { title: "Administradores", url: "/admin/admins", icon: Shield },
+  { title: "Dashboard", url: "/recrutador", icon: LayoutDashboard },
+  { title: "Clientes", url: "/recrutador/clientes", icon: Users },
+  { title: "Saques", url: "/recrutador/saques", icon: Wallet },
+  { title: "Perfil", url: "/recrutador/perfil", icon: User },
 ];
 
-function AdminSidebar() {
+function RecruiterSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
 
@@ -40,7 +28,7 @@ function AdminSidebar() {
             {!collapsed && (
               <span className="flex items-center gap-2">
                 <img src="/lovable-uploads/logo.png" alt="Logo" className="w-6 h-6 rounded" />
-                Admin
+                Recrutador
               </span>
             )}
           </SidebarGroupLabel>
@@ -49,12 +37,7 @@ function AdminSidebar() {
               {NAV.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/admin"}
-                      className="hover:bg-muted/50 flex items-center gap-2 px-3 py-2 rounded-md text-sm"
-                      activeClassName="bg-primary/10 text-primary font-medium"
-                    >
+                    <NavLink to={item.url} end={item.url === "/recrutador"} className="hover:bg-muted/50 flex items-center gap-2 px-3 py-2 rounded-md text-sm" activeClassName="bg-primary/10 text-primary font-medium">
                       <item.icon className="h-4 w-4 shrink-0" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>
@@ -69,25 +52,18 @@ function AdminSidebar() {
   );
 }
 
-const AdminLayout = () => {
+const RecruiterLayout = () => {
   const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/login");
-  };
+  const handleLogout = async () => { await signOut(auth); navigate("/recrutador/login"); };
 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
-        <AdminSidebar />
+        <RecruiterSidebar />
         <div className="flex-1 flex flex-col">
           <header className="h-14 flex items-center justify-between border-b border-border px-4">
             <SidebarTrigger className="ml-1" />
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
               <LogOut className="w-4 h-4" /> Sair
             </button>
           </header>
@@ -100,4 +76,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default RecruiterLayout;

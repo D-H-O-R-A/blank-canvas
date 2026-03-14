@@ -12,7 +12,7 @@ const { logError } = require("../middleware/logger");
 // ----- POST /register -----
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, whatsapp, profession, password, plan } = req.body;
+    const { name, email, whatsapp, profession, password, plan, birthDate } = req.body;
 
     if (!name || !email || !password || !plan || !whatsapp) {
       return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
@@ -40,6 +40,7 @@ router.post("/register", async (req, res) => {
       whatsapp,
       profession: profession || "",
       plan,
+      birthDate: birthDate || null,
       subscriptionStatus: "pending",
       about: "",
       socialLinks: { instagram: "", facebook: "", linkedin: "", website: "" },

@@ -40,6 +40,7 @@ interface Professional {
   totalPayments?: number;
   nextBillingMonths?: number;
   blocked?: boolean;
+  birthDate?: string;
 }
 
 const PAYMENT_METHODS = [
@@ -58,7 +59,7 @@ const AdminUsers = () => {
   const [renewUid, setRenewUid] = useState<string | null>(null);
   const [renewDate, setRenewDate] = useState<Date | undefined>(undefined);
   const [renewMethod, setRenewMethod] = useState("pix");
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined as Date | undefined });
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined as Date | undefined, birthDate: "" });
   const [saving, setSaving] = useState(false);
   const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
   const [editPhotoPreview, setEditPhotoPreview] = useState<string | null>(null);
@@ -96,12 +97,12 @@ const AdminUsers = () => {
       const res = await fetch(`${API_BASE}/admin/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...newUser, paidUntil: newUser.paidUntilDate?.toISOString() }),
+        body: JSON.stringify({ ...newUser, paidUntil: newUser.paidUntilDate?.toISOString(), birthDate: newUser.birthDate || undefined }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       toast({ title: "Usuário criado!" });
       setCreateOpen(false);
-      setNewUser({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined });
+      setNewUser({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined, birthDate: "" });
       loadUsers();
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
@@ -269,6 +270,10 @@ const AdminUsers = () => {
               <Input placeholder="Senha (min 6)" type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
               <Input placeholder="WhatsApp" value={newUser.whatsapp} onChange={(e) => setNewUser({ ...newUser, whatsapp: e.target.value })} />
               <Input placeholder="Profissão" value={newUser.profession} onChange={(e) => setNewUser({ ...newUser, profession: e.target.value })} />
+              <div className="space-y-1">
+                <Label>Data de nascimento</Label>
+                <Input type="date" value={newUser.birthDate} onChange={(e) => setNewUser({ ...newUser, birthDate: e.target.value })} />
+              </div>
               <Select value={newUser.plan} onValueChange={(v) => setNewUser({ ...newUser, plan: v })}>
                 <SelectTrigger><SelectValue placeholder="Plano" /></SelectTrigger>
                 <SelectContent>
@@ -470,6 +475,13 @@ const AdminUsers = () => {
                 <Label>Sobre</Label>
                 <Textarea value={editUser.about || ""} onChange={(e) => setEditUser({ ...editUser, about: e.target.value })} rows={3} />
               </div>
+
+              {editUser.birthDate && (
+                <div className="space-y-1">
+                  <Label>Data de nascimento</Label>
+                  <Input value={editUser.birthDate} disabled className="bg-muted/50" />
+                </div>
+              )}
 
               {/* Social Links */}
               <div className="space-y-2">
