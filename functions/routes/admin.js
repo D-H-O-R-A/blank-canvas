@@ -393,9 +393,14 @@ router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/contacts -----
 router.get("/admin/contacts", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("contacts").orderBy("createdAt", "desc").get();
-    const contacts = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return res.status(200).json(contacts);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("contacts").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("contacts").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/contacts error:", error);
     await logError(req, error);
