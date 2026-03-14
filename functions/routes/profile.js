@@ -2,32 +2,13 @@
  * =========================================================================
  * routes/profile.js — Endpoints do profissional autenticado
  * =========================================================================
- *
- * Rotas protegidas por JWT (requireAuth):
- *
- * GET /profile
- *   Retorna perfil do profissional autenticado.
- *   Header: Authorization: Bearer <JWT>
- *   Retorna: { name, email, whatsapp, profession, plan, subscriptionStatus, ... }
- *
- * PUT /profile
- *   Atualiza perfil do profissional autenticado.
- *   Header: Authorization: Bearer <JWT>
- *   Body: { name?, whatsapp?, profession?, about?, socialLinks? }
- *   Retorna: { ok: true }
- *
- * POST /create-payment
- *   Gera novo link de pagamento do Mercado Pago.
- *   Header: Authorization: Bearer <JWT>
- *   Body: { plan? }
- *   Retorna: { paymentUrl: string }
- * =========================================================================
  */
 
 const express = require("express");
 const router = express.Router();
 const { admin, db, mercadoPagoToken, APP_BASE_URL, PLAN_CONFIG } = require("../config");
 const { requireAuth } = require("../middleware/auth");
+const { logError } = require("../middleware/logger");
 
 // ----- GET /profile -----
 router.get("/profile", requireAuth, async (req, res) => {
@@ -39,6 +20,7 @@ router.get("/profile", requireAuth, async (req, res) => {
     return res.status(200).json(doc.data());
   } catch (error) {
     console.error("getProfile error:", error);
+    await logError(req, error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -59,6 +41,7 @@ router.put("/profile", requireAuth, async (req, res) => {
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("updateProfile error:", error);
+    await logError(req, error);
     return res.status(500).json({ error: error.message });
   }
 });
@@ -107,6 +90,7 @@ router.post("/create-payment", requireAuth, async (req, res) => {
     return res.status(200).json({ paymentUrl: mpData.init_point });
   } catch (error) {
     console.error("create-payment error:", error);
+    await logError(req, error);
     return res.status(500).json({ error: error.message });
   }
 });

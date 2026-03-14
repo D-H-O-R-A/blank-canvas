@@ -2,29 +2,12 @@
  * =========================================================================
  * routes/public.js — Endpoints públicos (sem autenticação)
  * =========================================================================
- *
- * Rotas que não exigem JWT:
- *
- * POST /register
- *   Cria usuário no Firebase Auth, perfil no Firestore e assinatura no MP.
- *   Body: { name, email, password, whatsapp, profession?, plan }
- *   Retorna: { paymentUrl: string }
- *
- * POST /contact
- *   Salva formulário de contato no Firestore.
- *   Body: { name, email, phone?, subject, message }
- *   Retorna: { ok: true, id: string }
- *
- * POST /webhook/mercadopago
- *   Recebe notificações do Mercado Pago sobre assinaturas.
- *   Body: { type, data: { id } }
- *   Retorna: { ok: true }
- * =========================================================================
  */
 
 const express = require("express");
 const router = express.Router();
 const { admin, db, mercadoPagoToken, APP_BASE_URL, PLAN_CONFIG } = require("../config");
+const { logError } = require("../middleware/logger");
 
 // ----- POST /register -----
 router.post("/register", async (req, res) => {
@@ -97,6 +80,7 @@ router.post("/register", async (req, res) => {
     return res.status(200).json({ paymentUrl: mpData.init_point });
   } catch (error) {
     console.error("register error:", error);
+    await logError(req, error);
     return res.status(500).json({ error: error.message || "Erro interno" });
   }
 });
@@ -126,6 +110,7 @@ router.post("/contact", async (req, res) => {
     return res.status(200).json({ ok: true, id: docRef.id });
   } catch (error) {
     console.error("contact error:", error);
+    await logError(req, error);
     return res.status(500).json({ error: error.message || "Erro interno" });
   }
 });
@@ -169,6 +154,7 @@ router.post("/webhook/mercadopago", async (req, res) => {
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("Webhook error:", error);
+    await logError(req, error);
     return res.status(200).json({ ok: true });
   }
 });

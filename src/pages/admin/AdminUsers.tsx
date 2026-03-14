@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, RefreshCw, Ban, Trash2, CheckCircle, XCircle } from "lucide-react";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -20,7 +21,18 @@ interface Professional {
   subscriptionStatus: string;
   paidUntil?: string;
   about?: string;
+  paymentMethod?: string;
+  totalPayments?: number;
+  nextBillingMonths?: number;
+  blocked?: boolean;
 }
+
+const PAYMENT_METHODS = [
+  { value: "pix", label: "PIX" },
+  { value: "dinheiro", label: "Dinheiro" },
+  { value: "cartao", label: "Cartão" },
+  { value: "mercado_pago", label: "Mercado Pago" },
+];
 
 const AdminUsers = () => {
   const { toast } = useToast();
@@ -28,7 +40,10 @@ const AdminUsers = () => {
   const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState<Professional | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês" });
+  const [renewUid, setRenewUid] = useState<string | null>(null);
+  const [renewMonths, setRenewMonths] = useState("1");
+  const [renewMethod, setRenewMethod] = useState("pix");
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", nextBillingMonths: "1" });
   const [saving, setSaving] = useState(false);
 
   const getToken = async () => auth.currentUser?.getIdToken();
@@ -50,12 +65,12 @@ const AdminUsers = () => {
       const res = await fetch(`${API_BASE}/admin/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify({ ...newUser, nextBillingMonths: parseInt(newUser.nextBillingMonths) }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       toast({ title: "Usuário criado!" });
       setCreateOpen(false);
-      setNewUser({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês" });
+      setNewUser({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", nextBillingMonths: "1" });
       loadUsers();
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
@@ -81,6 +96,64 @@ const AdminUsers = () => {
     } finally { setSaving(false); }
   };
 
+  const handleRenew = async () => {
+    if (!renewUid) return;
+    setSaving(true);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_BASE}/admin/users/${renewUid}/renew`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ months: parseInt(renewMonths), paymentMethod: renewMethod }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      toast({ title: "Assinatura renovada!" });
+      setRenewUid(null);
+      loadUsers();
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    } finally { setSaving(false); }
+  };
+
+  const handleBlock = async (uid: string) => {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_BASE}/admin/users/${uid}/block`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      const data = await res.json();
+      toast({ title: data.blocked ? "Usuário bloqueado" : "Usuário desbloqueado" });
+      loadUsers();
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const handleDelete = async (uid: string) => {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_BASE}/admin/users/${uid}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      toast({ title: "Usuário excluído" });
+      loadUsers();
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
+  const getStatusBadge = (u: Professional) => {
+    if (u.blocked) return <span className="px-2 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">Bloqueado</span>;
+    if (u.subscriptionStatus === "active") return <span className="px-2 py-1 rounded-full text-xs font-medium bg-primary/20 text-primary">Ativo</span>;
+    return <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-600">{u.subscriptionStatus}</span>;
+  };
+
+  const getMethodLabel = (method?: string) => PAYMENT_METHODS.find((m) => m.value === method)?.label || method || "—";
+
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
   return (
@@ -91,7 +164,7 @@ const AdminUsers = () => {
           <DialogTrigger asChild>
             <Button variant="hero" size="sm"><Plus className="w-4 h-4 mr-1" /> Novo</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md max-h-[85vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Criar Usuário</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <Input placeholder="Nome" value={newUser.name} onChange={(e) => setNewUser({ ...newUser, name: e.target.value })} />
@@ -100,12 +173,22 @@ const AdminUsers = () => {
               <Input placeholder="WhatsApp" value={newUser.whatsapp} onChange={(e) => setNewUser({ ...newUser, whatsapp: e.target.value })} />
               <Input placeholder="Profissão" value={newUser.profession} onChange={(e) => setNewUser({ ...newUser, profession: e.target.value })} />
               <Select value={newUser.plan} onValueChange={(v) => setNewUser({ ...newUser, plan: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Plano" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="1 mês">1 mês - R$25</SelectItem>
                   <SelectItem value="6 meses">6 meses - R$23</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={newUser.paymentMethod} onValueChange={(v) => setNewUser({ ...newUser, paymentMethod: v })}>
+                <SelectTrigger><SelectValue placeholder="Forma de pagamento" /></SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <div className="space-y-1">
+                <label className="text-sm font-medium text-foreground">Duração da mensalidade (meses)</label>
+                <Input type="number" min="1" max="12" value={newUser.nextBillingMonths} onChange={(e) => setNewUser({ ...newUser, nextBillingMonths: e.target.value })} />
+              </div>
               <Button onClick={handleCreate} disabled={saving} className="w-full">{saving ? "Criando..." : "Criar"}</Button>
             </div>
           </DialogContent>
@@ -119,33 +202,74 @@ const AdminUsers = () => {
               <th className="p-3">Nome</th>
               <th className="p-3">E-mail</th>
               <th className="p-3">WhatsApp</th>
-              <th className="p-3">Plano</th>
+              <th className="p-3">Pagamento</th>
               <th className="p-3">Status</th>
-              <th className="p-3">Pago até</th>
-              <th className="p-3"></th>
+              <th className="p-3">Vencimento</th>
+              <th className="p-3">Mensalidades</th>
+              <th className="p-3">Ações</th>
             </tr>
           </thead>
           <tbody>
             {users.map((u) => (
-              <tr key={u.uid} className="border-b border-border/50 hover:bg-muted/30">
+              <tr key={u.uid} className={`border-b border-border/50 hover:bg-muted/30 ${u.blocked ? "opacity-60" : ""}`}>
                 <td className="p-3 font-medium text-foreground">{u.name}</td>
-                <td className="p-3 text-muted-foreground">{u.email}</td>
+                <td className="p-3 text-muted-foreground text-xs">{u.email}</td>
                 <td className="p-3 text-muted-foreground">{u.whatsapp}</td>
-                <td className="p-3">{u.plan}</td>
-                <td className="p-3">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${u.subscriptionStatus === "active" ? "bg-primary/20 text-primary" : "bg-yellow-500/20 text-yellow-600"}`}>
-                    {u.subscriptionStatus}
-                  </span>
-                </td>
+                <td className="p-3 text-muted-foreground">{getMethodLabel(u.paymentMethod)}</td>
+                <td className="p-3">{getStatusBadge(u)}</td>
                 <td className="p-3 text-muted-foreground">{u.paidUntil ? new Date(u.paidUntil).toLocaleDateString("pt-BR") : "—"}</td>
+                <td className="p-3 text-center text-muted-foreground">{u.totalPayments ?? 0}</td>
                 <td className="p-3">
-                  <Button variant="ghost" size="icon" onClick={() => setEditUser(u)}><Pencil className="w-4 h-4" /></Button>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="icon" title="Editar" onClick={() => setEditUser(u)}><Pencil className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="icon" title="Renovar" onClick={() => { setRenewUid(u.uid); setRenewMethod(u.paymentMethod || "pix"); }}><RefreshCw className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="icon" title={u.blocked ? "Desbloquear" : "Bloquear"} onClick={() => handleBlock(u.uid)}>
+                      {u.blocked ? <CheckCircle className="w-4 h-4 text-primary" /> : <Ban className="w-4 h-4 text-destructive" />}
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="ghost" size="icon" title="Excluir"><Trash2 className="w-4 h-4 text-destructive" /></Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Excluir usuário?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Esta ação é irreversível. O usuário <strong>{u.name}</strong> ({u.email}) será removido permanentemente do sistema.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(u.uid)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Renew Dialog */}
+      <Dialog open={!!renewUid} onOpenChange={(open) => !open && setRenewUid(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader><DialogTitle>Renovar Assinatura</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-foreground">Meses de renovação</label>
+              <Input type="number" min="1" max="12" value={renewMonths} onChange={(e) => setRenewMonths(e.target.value)} />
+            </div>
+            <Select value={renewMethod} onValueChange={setRenewMethod}>
+              <SelectTrigger><SelectValue placeholder="Forma de pagamento" /></SelectTrigger>
+              <SelectContent>
+                {PAYMENT_METHODS.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Button onClick={handleRenew} disabled={saving} className="w-full">{saving ? "Renovando..." : "Renovar"}</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Edit Dialog */}
       <Dialog open={!!editUser} onOpenChange={(open) => !open && setEditUser(null)}>
@@ -164,6 +288,12 @@ const AdminUsers = () => {
                   <SelectItem value="6 meses">6 meses</SelectItem>
                 </SelectContent>
               </Select>
+              <Select value={editUser.paymentMethod || "pix"} onValueChange={(v) => setEditUser({ ...editUser, paymentMethod: v })}>
+                <SelectTrigger><SelectValue placeholder="Forma de pagamento" /></SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map((m) => <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <Select value={editUser.subscriptionStatus} onValueChange={(v) => setEditUser({ ...editUser, subscriptionStatus: v })}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
@@ -172,6 +302,16 @@ const AdminUsers = () => {
                   <SelectItem value="cancelled">Cancelado</SelectItem>
                 </SelectContent>
               </Select>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">Mensalidades pagas</label>
+                  <Input type="number" min="0" value={editUser.totalPayments ?? 0} onChange={(e) => setEditUser({ ...editUser, totalPayments: parseInt(e.target.value) || 0 })} />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-sm font-medium text-foreground">Próx. renovação (meses)</label>
+                  <Input type="number" min="1" max="12" value={editUser.nextBillingMonths ?? 1} onChange={(e) => setEditUser({ ...editUser, nextBillingMonths: parseInt(e.target.value) || 1 })} />
+                </div>
+              </div>
               <div className="space-y-1">
                 <label className="text-sm font-medium text-foreground">Pago até</label>
                 <Input type="date" value={editUser.paidUntil ? editUser.paidUntil.split("T")[0] : ""} onChange={(e) => setEditUser({ ...editUser, paidUntil: e.target.value ? new Date(e.target.value).toISOString() : undefined })} />
