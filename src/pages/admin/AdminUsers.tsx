@@ -59,7 +59,7 @@ const AdminUsers = () => {
   const [renewUid, setRenewUid] = useState<string | null>(null);
   const [renewDate, setRenewDate] = useState<Date | undefined>(undefined);
   const [renewMethod, setRenewMethod] = useState("pix");
-  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined as Date | undefined });
+  const [newUser, setNewUser] = useState({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined as Date | undefined, birthDate: "" });
   const [saving, setSaving] = useState(false);
   const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
   const [editPhotoPreview, setEditPhotoPreview] = useState<string | null>(null);
