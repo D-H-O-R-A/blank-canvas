@@ -97,7 +97,7 @@ const AdminUsers = () => {
       const res = await fetch(`${API_BASE}/admin/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ ...newUser, paidUntil: newUser.paidUntilDate?.toISOString() }),
+        body: JSON.stringify({ ...newUser, paidUntil: newUser.paidUntilDate?.toISOString(), birthDate: newUser.birthDate || undefined }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
       toast({ title: "Usuário criado!" });
