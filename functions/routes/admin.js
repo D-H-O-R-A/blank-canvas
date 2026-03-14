@@ -482,7 +482,7 @@ router.get("/admin/recruiters", requireAuth, requireAdmin, async (req, res) => {
 router.put("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { uid } = req.params;
-    const allowed = ["name", "whatsapp", "profession", "address", "pixKey", "commissionPercent", "blocked"];
+    const allowed = ["name", "whatsapp", "profession", "address", "pixKey", "commissionPercent", "blocked", "totalCommission", "availableBalance"];
     const updateData = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     for (const field of allowed) {
       if (req.body[field] !== undefined) updateData[field] = req.body[field];
@@ -511,6 +511,22 @@ router.delete("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, r
     try { await admin.auth().deleteUser(uid); } catch (e) { /* ignore */ }
     await logAdminAction(req, "recruiter_deleted", { targetUid: uid });
     return res.status(200).json({ ok: true });
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- PUT /admin/recruiters/:uid/approve -----
+router.put("/admin/recruiters/:uid/approve", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const doc = await db.collection("recruiters").doc(uid).get();
+    if (!doc.exists) return res.status(404).json({ error: "Recrutador não encontrado" });
+    const approved = !doc.data().approved;
+    await db.collection("recruiters").doc(uid).update({ approved, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+    await logAdminAction(req, approved ? "recruiter_approved" : "recruiter_unapproved", { targetUid: uid });
+    return res.status(200).json({ ok: true, approved });
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });

@@ -71,7 +71,7 @@ const RecruiterRegister = () => {
         throw new Error(data.error);
       }
 
-      toast({ title: "Cadastro realizado!", description: "Faça login para acessar o painel." });
+      toast({ title: "Cadastro realizado!", description: "Aguarde a aprovação do administrador para acessar o painel." });
       navigate("/recrutador/login");
     } catch (error: any) {
       toast({ title: "Erro no cadastro", description: error.message, variant: "destructive" });
