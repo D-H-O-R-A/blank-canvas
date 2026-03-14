@@ -40,6 +40,7 @@ interface Professional {
   totalPayments?: number;
   nextBillingMonths?: number;
   blocked?: boolean;
+  birthDate?: string;
 }
 
 const PAYMENT_METHODS = [
