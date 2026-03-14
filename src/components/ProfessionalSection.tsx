@@ -120,6 +120,7 @@ export const ProfessionalSection = () => {
           profession: formData.profession,
           password: formData.password,
           plan: formData.plan,
+          birthDate: formData.birthDate || undefined,
         }),
       });
 

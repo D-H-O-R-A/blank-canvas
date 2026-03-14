@@ -270,6 +270,10 @@ const AdminUsers = () => {
               <Input placeholder="Senha (min 6)" type="password" value={newUser.password} onChange={(e) => setNewUser({ ...newUser, password: e.target.value })} />
               <Input placeholder="WhatsApp" value={newUser.whatsapp} onChange={(e) => setNewUser({ ...newUser, whatsapp: e.target.value })} />
               <Input placeholder="Profissão" value={newUser.profession} onChange={(e) => setNewUser({ ...newUser, profession: e.target.value })} />
+              <div className="space-y-1">
+                <Label>Data de nascimento</Label>
+                <Input type="date" value={newUser.birthDate} onChange={(e) => setNewUser({ ...newUser, birthDate: e.target.value })} />
+              </div>
               <Select value={newUser.plan} onValueChange={(v) => setNewUser({ ...newUser, plan: v })}>
                 <SelectTrigger><SelectValue placeholder="Plano" /></SelectTrigger>
                 <SelectContent>
