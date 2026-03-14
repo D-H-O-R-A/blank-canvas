@@ -74,16 +74,21 @@ export const ProfessionalSection = () => {
   ];
 
   const validateForm = (): boolean => {
-    if (!formData.name.trim()) {
-      toast({ title: "Informe seu nome completo", variant: "destructive" });
+    if (!formData.name.trim() || formData.name.trim().length < 3) {
+      toast({ title: "Informe seu nome completo (mínimo 3 caracteres)", variant: "destructive" });
       return false;
     }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       toast({ title: "Informe um e-mail válido", variant: "destructive" });
       return false;
     }
-    if (!formData.whatsapp.trim() || formData.whatsapp.replace(/\D/g, "").length < 10) {
-      toast({ title: "Informe um WhatsApp válido", variant: "destructive" });
+    const digits = formData.whatsapp.replace(/\D/g, "");
+    if (!digits || digits.length < 10 || digits.length > 11) {
+      toast({ title: "Informe um WhatsApp válido (10-11 dígitos)", variant: "destructive" });
+      return false;
+    }
+    if (!formData.profession.trim() || formData.profession.trim().length < 2) {
+      toast({ title: "Informe sua profissão", variant: "destructive" });
       return false;
     }
     if (!formData.password || formData.password.length < 6) {
