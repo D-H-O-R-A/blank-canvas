@@ -618,6 +618,8 @@ router.post("/admin/recruiters/:uid/photo", requireAuth, requireAdmin, async (re
 // ----- GET /admin/withdrawals -----
 router.get("/admin/withdrawals", requireAuth, requireAdmin, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
     const recruitersSnap = await db.collection("recruiters").get();
     const withdrawals = [];
     for (const rDoc of recruitersSnap.docs) {
@@ -635,7 +637,10 @@ router.get("/admin/withdrawals", requireAuth, requireAdmin, async (req, res) => 
       }
     }
     withdrawals.sort((a, b) => (b.requestedAt || "").localeCompare(a.requestedAt || ""));
-    return res.status(200).json(withdrawals);
+    const total = withdrawals.length;
+    const totalPages = Math.ceil(total / limit);
+    const data = withdrawals.slice((page - 1) * limit, page * limit);
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });
