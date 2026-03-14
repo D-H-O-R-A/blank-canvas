@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
-import { Users, CreditCard, Mail, ScrollText } from "lucide-react";
+import { Users, CreditCard, Mail, ScrollText, UserCheck, Wallet } from "lucide-react";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
