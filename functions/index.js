@@ -76,5 +76,6 @@ app.use(publicRoutes);
 app.use(profileRoutes);
 app.use(adminRoutes);
 
-// Export como função HTTP única (2nd gen) com acesso ao secret do MP
+// Export como funções HTTP (2nd gen) com acesso ao secret do MP
 exports.api = onRequest({ secrets: [mercadoPagoToken] }, app);
+exports.webhook = onRequest({ secrets: [mercadoPagoToken] }, webhookApp);

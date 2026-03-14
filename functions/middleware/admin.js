@@ -28,7 +28,7 @@ const { db } = require("../config");
 async function requireAdmin(req, res, next) {
   try {
     const doc = await db.collection("admin").doc(req.uid).get();
-    if (!doc.exists || doc.data().isAdmin !== true) {
+    if (!doc.exists || doc.data().isadmin !== true) {
       return res.status(403).json({ error: "Acesso restrito a administradores" });
     }
     next();

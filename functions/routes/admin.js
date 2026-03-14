@@ -265,7 +265,7 @@ router.post("/admin/admins", requireAuth, requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "Usuário não encontrado com este e-mail" });
     }
 
-    await db.collection("admin").doc(userRecord.uid).set({ isAdmin: true }, { merge: true });
+    await db.collection("admin").doc(userRecord.uid).set({ isadmin: true }, { merge: true });
     return res.status(200).json({ ok: true, uid: userRecord.uid });
   } catch (error) {
     console.error("admin/admins POST error:", error);
