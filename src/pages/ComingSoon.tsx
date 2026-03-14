@@ -141,6 +141,10 @@ const ComingSoon = () => {
           camera={{ position: [0, 0, 8], fov: 60 }}
           dpr={[1, 1.5]}
           style={{ background: "transparent" }}
+          onCreated={() => {}}
+          fallback={
+            <div className="w-full h-full bg-gradient-to-br from-primary/10 via-background to-primary/5" />
+          }
         >
           <Scene />
         </Canvas>
