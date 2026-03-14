@@ -338,6 +338,8 @@ router.put("/admin/users/:uid/block", requireAuth, requireAdmin, async (req, res
 // ----- GET /admin/payments -----
 router.get("/admin/payments", requireAuth, requireAdmin, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
     const usersSnap = await db.collection("professionals").get();
     const payments = [];
 
@@ -359,7 +361,10 @@ router.get("/admin/payments", requireAuth, requireAdmin, async (req, res) => {
     }
 
     payments.sort((a, b) => (b.paidAt || "").localeCompare(a.paidAt || ""));
-    return res.status(200).json(payments);
+    const total = payments.length;
+    const totalPages = Math.ceil(total / limit);
+    const data = payments.slice((page - 1) * limit, page * limit);
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/payments error:", error);
     await logError(req, error);
