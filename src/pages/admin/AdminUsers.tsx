@@ -64,14 +64,21 @@ const AdminUsers = () => {
   const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
   const [editPhotoPreview, setEditPhotoPreview] = useState<string | null>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const getToken = async () => auth.currentUser?.getIdToken();
 
-  const loadUsers = async () => {
+  const loadUsers = async (p = page) => {
     try {
       const token = await getToken();
-      const res = await fetch(`${API_BASE}/admin/users`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setUsers(await res.json());
+      const res = await fetch(`${API_BASE}/admin/users?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const json = await res.json();
+        setUsers(json.data);
+        setTotalPages(json.totalPages);
+        setPage(json.page);
+      }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
