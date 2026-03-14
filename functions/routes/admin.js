@@ -235,7 +235,7 @@ router.get("/admin/contacts", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/admins -----
 router.get("/admin/admins", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("admin").where("isAdmin", "==", true).get();
+    const snap = await db.collection("admin").where("isadmin", "==", true).get();
     const admins = [];
     for (const doc of snap.docs) {
       let email = "";
