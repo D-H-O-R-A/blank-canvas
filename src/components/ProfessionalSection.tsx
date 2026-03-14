@@ -262,6 +262,14 @@ export const ProfessionalSection = () => {
                   </div>
 
                   {/* Password */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="birthDate">Data de nascimento</Label>
+                      <Input id="birthDate" type="date" value={formData.birthDate} onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })} className="h-12" />
+                    </div>
+                  </div>
+
+                  {/* Password */}
                   <div className="space-y-2">
                     <Label htmlFor="password">Senha *</Label>
                     <div className="relative">
