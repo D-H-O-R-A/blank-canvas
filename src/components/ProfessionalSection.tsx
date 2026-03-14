@@ -255,20 +255,8 @@ export const ProfessionalSection = () => {
                       <Input id="whatsapp" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} placeholder="(11) 99999-9999" className="h-12" required />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="profession">Profissão</Label>
-                      <Select onValueChange={(value) => setFormData({ ...formData, profession: value })}>
-                        <SelectTrigger className="h-12"><SelectValue placeholder="Selecione sua área" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="encanador">Encanador</SelectItem>
-                          <SelectItem value="eletricista">Eletricista</SelectItem>
-                          <SelectItem value="manicure">Manicure/Pedicure</SelectItem>
-                          <SelectItem value="professor">Professor Particular</SelectItem>
-                          <SelectItem value="psicologo">Psicólogo</SelectItem>
-                          <SelectItem value="cuidador">Cuidador</SelectItem>
-                          <SelectItem value="tecnico-ti">Técnico em TI</SelectItem>
-                          <SelectItem value="outro">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="profession">Profissão *</Label>
+                      <Input id="profession" value={formData.profession} onChange={(e) => setFormData({ ...formData, profession: e.target.value })} placeholder="Ex: Eletricista, Encanador, Designer..." className="h-12" required />
                     </div>
                   </div>
 

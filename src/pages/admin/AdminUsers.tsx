@@ -58,7 +58,19 @@ const AdminUsers = () => {
 
   useEffect(() => { loadUsers(); }, []);
 
+  const validateNewUser = (): string | null => {
+    if (!newUser.name.trim()) return "Informe o nome.";
+    if (!newUser.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newUser.email)) return "E-mail inválido.";
+    if (!newUser.password || newUser.password.length < 6) return "Senha deve ter pelo menos 6 caracteres.";
+    const digits = newUser.whatsapp.replace(/\D/g, "");
+    if (!digits || digits.length < 10 || digits.length > 11) return "WhatsApp inválido (10-11 dígitos).";
+    if (!newUser.profession.trim()) return "Informe a profissão.";
+    return null;
+  };
+
   const handleCreate = async () => {
+    const error = validateNewUser();
+    if (error) { toast({ title: error, variant: "destructive" }); return; }
     setSaving(true);
     try {
       const token = await getToken();
