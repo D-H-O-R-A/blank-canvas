@@ -76,10 +76,19 @@ router.get("/admin/stats", requireAuth, requireAdmin, async (req, res) => {
 
     const logsSnap = await db.collection("logs").get();
 
+    // Recruiter stats
+    const recruitersSnap = await db.collection("recruiters").get();
+    let pendingWithdrawals = 0;
+    for (const rDoc of recruitersSnap.docs) {
+      const wSnap = await db.collection("recruiters").doc(rDoc.id).collection("withdrawals").where("status", "==", "pending").get();
+      pendingWithdrawals += wSnap.size;
+    }
+
     return res.status(200).json({
       totalUsers: userDocs.length, activeUsers, pendingUsers, blockedUsers,
       totalPayments, successPayments, failedPayments, pendingPayments: pendingPaymentsCount,
       totalContacts: contactsSnap.size, unreadContacts, totalLogs: logsSnap.size,
+      totalRecruiters: recruitersSnap.size, pendingWithdrawals,
     });
   } catch (error) {
     console.error("admin/stats error:", error);
