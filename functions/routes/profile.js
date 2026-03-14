@@ -38,9 +38,50 @@ router.put("/profile", requireAuth, async (req, res) => {
     if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
 
     await db.collection("professionals").doc(req.uid).update(updateData);
+
+    // Sync displayName to Auth if name changed
+    if (name) {
+      try { await admin.auth().updateUser(req.uid, { displayName: name }); } catch (e) { /* ignore */ }
+    }
+
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("updateProfile error:", error);
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- POST /profile/photo -----
+router.post("/profile/photo", requireAuth, async (req, res) => {
+  try {
+    const { photo, contentType } = req.body;
+
+    if (!photo) return res.status(400).json({ error: "Foto não enviada" });
+
+    const bucket = admin.storage().bucket();
+    const ext = contentType === "image/png" ? "png" : "jpg";
+    const filePath = `profile-photos/${req.uid}.${ext}`;
+    const file = bucket.file(filePath);
+
+    const buffer = Buffer.from(photo, "base64");
+    await file.save(buffer, {
+      metadata: { contentType: contentType || "image/jpeg" },
+      public: true,
+    });
+
+    const photoURL = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+    // Update Auth + Firestore
+    await admin.auth().updateUser(req.uid, { photoURL });
+    await db.collection("professionals").doc(req.uid).update({
+      photoURL,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return res.status(200).json({ ok: true, photoURL });
+  } catch (error) {
+    console.error("profile/photo error:", error);
     await logError(req, error);
     return res.status(500).json({ error: error.message });
   }
