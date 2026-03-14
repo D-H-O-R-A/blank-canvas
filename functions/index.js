@@ -38,6 +38,7 @@ const { logAction } = require("./middleware/logger");
 const publicRoutes = require("./routes/public");
 const profileRoutes = require("./routes/profile");
 const adminRoutes = require("./routes/admin");
+const recruiterRoutes = require("./routes/recruiter");
 const webhookApp = require("./webhook");
 
 // Express app
