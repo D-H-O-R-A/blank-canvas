@@ -41,7 +41,32 @@ const adminRoutes = require("./routes/admin");
 
 // Express app
 const app = express();
-app.use(cors({ origin: true }));
+
+const allowedOrigins = [
+  "https://clickservico.com",
+  "https://www.clickservico.com",
+  "https://clickservico.com.br",
+  "https://www.clickservico.com.br",
+  "https://click-servico.web.app",
+  "https://click-servico.firebaseapp.com",
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, webhooks)
+    if (!origin) return callback(null, true);
+    // Allow all Lovable preview/project domains
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".lovable.app") ||
+      origin.endsWith(".lovableproject.com")
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, false);
+  },
+  credentials: true,
+}));
 app.use(express.json());
 app.use(logAction);
 
