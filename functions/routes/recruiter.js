@@ -77,10 +77,12 @@ router.post("/recruiter/register", async (req, res) => {
   }
 });
 
-// ----- GET /recruiter/profile -----
-router.get("/recruiter/profile", requireAuth, requireRecruiter, async (req, res) => {
+// ----- GET /recruiter/profile (accessible even if not approved) -----
+router.get("/recruiter/profile", requireAuth, async (req, res) => {
   try {
-    return res.status(200).json(req.recruiter);
+    const doc = await db.collection("recruiters").doc(req.uid).get();
+    if (!doc.exists) return res.status(403).json({ error: "Acesso restrito a recrutadores" });
+    return res.status(200).json(doc.data());
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });

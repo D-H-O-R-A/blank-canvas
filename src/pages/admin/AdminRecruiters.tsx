@@ -3,10 +3,11 @@ import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Ban, CheckCircle, Users, Camera, Percent } from "lucide-react";
+import { Pencil, Trash2, Ban, CheckCircle, Users, Camera, Percent, ShieldCheck } from "lucide-react";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -25,6 +26,7 @@ interface Recruiter {
   totalCommission: number;
   availableBalance: number;
   blocked: boolean;
+  approved?: boolean;
 }
 
 const AdminRecruiters = () => {
@@ -52,11 +54,23 @@ const AdminRecruiters = () => {
 
   useEffect(() => { load(); }, []);
 
+  const handleApprove = async (uid: string) => {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${API_BASE}/admin/recruiters/${uid}/approve`, { method: "PUT", headers: { Authorization: `Bearer ${token}` } });
+      if (!res.ok) throw new Error((await res.json()).error);
+      const data = await res.json();
+      toast({ title: data.approved ? "Recrutador aprovado!" : "Aprovação revogada" });
+      load();
+    } catch (e: any) {
+      toast({ title: "Erro", description: e.message, variant: "destructive" });
+    }
+  };
+
   const handleUpdate = async () => {
     if (!editRecruiter) return;
     setSaving(true);
     try {
-      // Upload photo if selected
       if (editPhotoFile) {
         const reader = new FileReader();
         const base64 = await new Promise<string>((resolve) => {
@@ -126,68 +140,110 @@ const AdminRecruiters = () => {
     } catch (e) { console.error(e); }
   };
 
+  const pendingRecruiters = recruiters.filter((r) => !r.approved);
+  const approvedRecruiters = recruiters.filter((r) => r.approved);
+
+  const renderRecruiterCard = (r: Recruiter) => (
+    <div key={r.uid} className={`bg-card border border-border rounded-xl p-4 space-y-3 ${r.blocked ? "opacity-60" : ""}`}>
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
+            {r.photoURL ? <img src={r.photoURL} className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-muted-foreground" />}
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium text-foreground truncate">{r.name}</p>
+            <p className="text-xs text-muted-foreground truncate">{r.email}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          {r.blocked && <Badge variant="destructive" className="text-[10px]">Bloqueado</Badge>}
+          {!r.approved && <Badge variant="secondary" className="text-[10px]">Pendente</Badge>}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+        <div><span className="text-muted-foreground">Comissão:</span><p className="text-foreground font-bold">{r.commissionPercent}%</p></div>
+        <div><span className="text-muted-foreground">Total comissão:</span><p className="text-foreground">R$ {r.totalCommission?.toFixed(2) || "0.00"}</p></div>
+        <div><span className="text-muted-foreground">Saldo:</span><p className="text-foreground">R$ {r.availableBalance?.toFixed(2) || "0.00"}</p></div>
+        <div><span className="text-muted-foreground">PIX:</span><p className="text-foreground truncate">{r.pixKey}</p></div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1 pt-1 border-t border-border/50">
+        {!r.approved && (
+          <Button variant="default" size="sm" onClick={() => handleApprove(r.uid)}>
+            <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Aprovar
+          </Button>
+        )}
+        {r.approved && (
+          <Button variant="ghost" size="sm" className="text-yellow-600" onClick={() => handleApprove(r.uid)}>
+            <ShieldCheck className="w-3.5 h-3.5 mr-1" /> Revogar
+          </Button>
+        )}
+        <Button variant="ghost" size="sm" onClick={() => { setEditRecruiter({ ...r }); setEditPhotoPreview(r.photoURL || null); setEditPhotoFile(null); }}>
+          <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => viewClients(r.uid)}>
+          <Users className="w-3.5 h-3.5 mr-1" /> Clientes
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => handleBlock(r.uid)}>
+          {r.blocked ? <CheckCircle className="w-3.5 h-3.5 text-primary" /> : <Ban className="w-3.5 h-3.5 text-destructive" />}
+        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="ghost" size="sm"><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir recrutador?</AlertDialogTitle>
+              <AlertDialogDescription>O recrutador <strong>{r.name}</strong> e todos os dados serão removidos.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={() => handleDelete(r.uid)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    </div>
+  );
+
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <h1 className="text-xl sm:text-2xl font-bold text-foreground">Recrutadores</h1>
 
-      {recruiters.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">Nenhum recrutador cadastrado.</div>
-      ) : (
-        <div className="space-y-3">
-          {recruiters.map((r) => (
-            <div key={r.uid} className={`bg-card border border-border rounded-xl p-4 space-y-3 ${r.blocked ? "opacity-60" : ""}`}>
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden shrink-0">
-                    {r.photoURL ? <img src={r.photoURL} className="w-full h-full object-cover" /> : <Users className="w-5 h-5 text-muted-foreground" />}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-medium text-foreground truncate">{r.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{r.email}</p>
-                  </div>
-                </div>
-                {r.blocked && <span className="px-2 py-1 rounded-full text-xs font-medium bg-destructive/20 text-destructive">Bloqueado</span>}
-              </div>
+      {/* Pending Section */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-yellow-500" />
+          Aguardando Aprovação
+          {pendingRecruiters.length > 0 && (
+            <Badge variant="secondary">{pendingRecruiters.length}</Badge>
+          )}
+        </h2>
+        {pendingRecruiters.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4">Nenhum recrutador pendente.</p>
+        ) : (
+          <div className="space-y-3">{pendingRecruiters.map(renderRecruiterCard)}</div>
+        )}
+      </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                <div><span className="text-muted-foreground">Comissão:</span><p className="text-foreground font-bold">{r.commissionPercent}%</p></div>
-                <div><span className="text-muted-foreground">Total comissão:</span><p className="text-foreground">R$ {r.totalCommission?.toFixed(2) || "0.00"}</p></div>
-                <div><span className="text-muted-foreground">Saldo:</span><p className="text-foreground">R$ {r.availableBalance?.toFixed(2) || "0.00"}</p></div>
-                <div><span className="text-muted-foreground">PIX:</span><p className="text-foreground truncate">{r.pixKey}</p></div>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-1 pt-1 border-t border-border/50">
-                <Button variant="ghost" size="sm" onClick={() => { setEditRecruiter({ ...r }); setEditPhotoPreview(r.photoURL || null); setEditPhotoFile(null); }}>
-                  <Pencil className="w-3.5 h-3.5 mr-1" /> Editar
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => viewClients(r.uid)}>
-                  <Users className="w-3.5 h-3.5 mr-1" /> Clientes
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => handleBlock(r.uid)}>
-                  {r.blocked ? <CheckCircle className="w-3.5 h-3.5 text-primary" /> : <Ban className="w-3.5 h-3.5 text-destructive" />}
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="ghost" size="sm"><Trash2 className="w-3.5 h-3.5 text-destructive" /></Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Excluir recrutador?</AlertDialogTitle>
-                      <AlertDialogDescription>O recrutador <strong>{r.name}</strong> e todos os dados serão removidos.</AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDelete(r.uid)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Approved Section */}
+      <div className="space-y-3">
+        <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+          <CheckCircle className="w-5 h-5 text-primary" />
+          Aprovados
+          {approvedRecruiters.length > 0 && (
+            <Badge>{approvedRecruiters.length}</Badge>
+          )}
+        </h2>
+        {approvedRecruiters.length === 0 ? (
+          <p className="text-sm text-muted-foreground py-4">Nenhum recrutador aprovado.</p>
+        ) : (
+          <div className="space-y-3">{approvedRecruiters.map(renderRecruiterCard)}</div>
+        )}
+      </div>
 
       {/* Edit Dialog */}
       <Dialog open={!!editRecruiter} onOpenChange={(open) => { if (!open) { setEditRecruiter(null); setEditPhotoFile(null); setEditPhotoPreview(null); } }}>
@@ -224,6 +280,17 @@ const AdminRecruiters = () => {
 
               <div className="space-y-1"><Label>Endereço</Label><Input value={editRecruiter.address} onChange={(e) => setEditRecruiter({ ...editRecruiter, address: e.target.value })} /></div>
               <div className="space-y-1"><Label>Chave PIX</Label><Input value={editRecruiter.pixKey} onChange={(e) => setEditRecruiter({ ...editRecruiter, pixKey: e.target.value })} /></div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label>Total Comissão (R$)</Label>
+                  <Input type="number" min="0" step="0.01" value={editRecruiter.totalCommission} onChange={(e) => setEditRecruiter({ ...editRecruiter, totalCommission: parseFloat(e.target.value) || 0 })} />
+                </div>
+                <div className="space-y-1">
+                  <Label>Saldo Disponível (R$)</Label>
+                  <Input type="number" min="0" step="0.01" value={editRecruiter.availableBalance} onChange={(e) => setEditRecruiter({ ...editRecruiter, availableBalance: parseFloat(e.target.value) || 0 })} />
+                </div>
+              </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div><span className="text-muted-foreground">CPF:</span><p className="text-foreground">{editRecruiter.cpf}</p></div>

@@ -482,7 +482,7 @@ router.get("/admin/recruiters", requireAuth, requireAdmin, async (req, res) => {
 router.put("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { uid } = req.params;
-    const allowed = ["name", "whatsapp", "profession", "address", "pixKey", "commissionPercent", "blocked"];
+    const allowed = ["name", "whatsapp", "profession", "address", "pixKey", "commissionPercent", "blocked", "totalCommission", "availableBalance"];
     const updateData = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
     for (const field of allowed) {
       if (req.body[field] !== undefined) updateData[field] = req.body[field];

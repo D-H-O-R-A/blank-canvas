@@ -85,12 +85,20 @@ const AdminLayout = () => {
         <div className="flex-1 flex flex-col">
           <header className="h-14 flex items-center justify-between border-b border-border px-4">
             <SidebarTrigger className="ml-1" />
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <LogOut className="w-4 h-4" /> Sair
-            </button>
+            <div className="flex items-center gap-3">
+              <Link to="/login" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted">
+                <ExternalLink className="w-3.5 h-3.5" /> Login Prestador
+              </Link>
+              <Link to="/recrutador/login" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-muted">
+                <ExternalLink className="w-3.5 h-3.5" /> Login Recrutador
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut className="w-4 h-4" /> Sair
+              </button>
+            </div>
           </header>
           <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
             <Outlet />
