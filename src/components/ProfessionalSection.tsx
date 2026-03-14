@@ -74,16 +74,21 @@ export const ProfessionalSection = () => {
   ];
 
   const validateForm = (): boolean => {
-    if (!formData.name.trim()) {
-      toast({ title: "Informe seu nome completo", variant: "destructive" });
+    if (!formData.name.trim() || formData.name.trim().length < 3) {
+      toast({ title: "Informe seu nome completo (mínimo 3 caracteres)", variant: "destructive" });
       return false;
     }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       toast({ title: "Informe um e-mail válido", variant: "destructive" });
       return false;
     }
-    if (!formData.whatsapp.trim() || formData.whatsapp.replace(/\D/g, "").length < 10) {
-      toast({ title: "Informe um WhatsApp válido", variant: "destructive" });
+    const digits = formData.whatsapp.replace(/\D/g, "");
+    if (!digits || digits.length < 10 || digits.length > 11) {
+      toast({ title: "Informe um WhatsApp válido (10-11 dígitos)", variant: "destructive" });
+      return false;
+    }
+    if (!formData.profession.trim() || formData.profession.trim().length < 2) {
+      toast({ title: "Informe sua profissão", variant: "destructive" });
       return false;
     }
     if (!formData.password || formData.password.length < 6) {
@@ -250,20 +255,8 @@ export const ProfessionalSection = () => {
                       <Input id="whatsapp" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} placeholder="(11) 99999-9999" className="h-12" required />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="profession">Profissão</Label>
-                      <Select onValueChange={(value) => setFormData({ ...formData, profession: value })}>
-                        <SelectTrigger className="h-12"><SelectValue placeholder="Selecione sua área" /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="encanador">Encanador</SelectItem>
-                          <SelectItem value="eletricista">Eletricista</SelectItem>
-                          <SelectItem value="manicure">Manicure/Pedicure</SelectItem>
-                          <SelectItem value="professor">Professor Particular</SelectItem>
-                          <SelectItem value="psicologo">Psicólogo</SelectItem>
-                          <SelectItem value="cuidador">Cuidador</SelectItem>
-                          <SelectItem value="tecnico-ti">Técnico em TI</SelectItem>
-                          <SelectItem value="outro">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <Label htmlFor="profession">Profissão *</Label>
+                      <Input id="profession" value={formData.profession} onChange={(e) => setFormData({ ...formData, profession: e.target.value })} placeholder="Ex: Eletricista, Encanador, Designer..." className="h-12" required />
                     </div>
                   </div>
 
@@ -342,7 +335,7 @@ export const ProfessionalSection = () => {
                     variant="hero"
                     size="lg"
                     className="w-full h-14 text-lg font-bold"
-                    disabled={loading || !formData.name || !formData.email || !formData.password || !formData.plan}
+                    disabled={loading || !formData.name || !formData.email || !formData.password || !formData.plan || !formData.profession}
                   >
                     {loading ? (
                       <>
