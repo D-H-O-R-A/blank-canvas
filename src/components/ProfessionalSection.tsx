@@ -27,6 +27,7 @@ export const ProfessionalSection = () => {
     profession: "",
     password: "",
     plan: "",
+    birthDate: "",
   });
 
   const benefits = [
