@@ -335,7 +335,7 @@ export const ProfessionalSection = () => {
                     variant="hero"
                     size="lg"
                     className="w-full h-14 text-lg font-bold"
-                    disabled={loading || !formData.name || !formData.email || !formData.password || !formData.plan}
+                    disabled={loading || !formData.name || !formData.email || !formData.password || !formData.plan || !formData.profession}
                   >
                     {loading ? (
                       <>
