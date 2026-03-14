@@ -100,9 +100,14 @@ router.get("/admin/stats", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/users -----
 router.get("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("professionals").orderBy("createdAt", "desc").get();
-    const users = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
-    return res.status(200).json(users);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("professionals").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("professionals").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/users GET error:", error);
     await logError(req, error);
