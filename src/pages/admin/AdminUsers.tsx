@@ -558,6 +558,7 @@ const AdminUsers = () => {
           )}
         </DialogContent>
       </Dialog>
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => loadUsers(p)} />
     </div>
   );
 };

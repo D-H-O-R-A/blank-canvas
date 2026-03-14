@@ -3,6 +3,7 @@ import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle, Mail } from "lucide-react";
+import AdminPagination from "@/components/AdminPagination";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -21,14 +22,21 @@ const AdminContacts = () => {
   const { toast } = useToast();
   const [contacts, setContacts] = useState<ContactEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const getToken = async () => auth.currentUser?.getIdToken();
 
-  const loadContacts = async () => {
+  const loadContacts = async (p = page) => {
     try {
       const token = await getToken();
-      const res = await fetch(`${API_BASE}/admin/contacts`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setContacts(await res.json());
+      const res = await fetch(`${API_BASE}/admin/contacts?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const json = await res.json();
+        setContacts(json.data);
+        setTotalPages(json.totalPages);
+        setPage(json.page);
+      }
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
@@ -43,7 +51,7 @@ const AdminContacts = () => {
         body: JSON.stringify({ read: true }),
       });
       toast({ title: "Marcado como lido" });
-      loadContacts();
+      loadContacts(page);
     } catch { toast({ title: "Erro", variant: "destructive" }); }
   };
 
@@ -79,6 +87,7 @@ const AdminContacts = () => {
           </div>
         ))}
       </div>
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => loadContacts(p)} />
     </div>
   );
 };

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
+import AdminPagination from "@/components/AdminPagination";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -17,17 +18,23 @@ interface Payment {
 const AdminPayments = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const token = await auth.currentUser?.getIdToken();
-        const res = await fetch(`${API_BASE}/admin/payments`, { headers: { Authorization: `Bearer ${token}` } });
-        if (res.ok) setPayments(await res.json());
-      } catch (e) { console.error(e); } finally { setLoading(false); }
-    };
-    load();
-  }, []);
+  const loadPayments = async (p = page) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const res = await fetch(`${API_BASE}/admin/payments?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const json = await res.json();
+        setPayments(json.data);
+        setTotalPages(json.totalPages);
+        setPage(json.page);
+      }
+    } catch (e) { console.error(e); } finally { setLoading(false); }
+  };
+
+  useEffect(() => { loadPayments(); }, []);
 
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
@@ -69,6 +76,7 @@ const AdminPayments = () => {
           </tbody>
         </table>
       </div>
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => loadPayments(p)} />
     </div>
   );
 };
