@@ -75,6 +75,45 @@ async function fetchPayment(id) {
   return res.json();
 }
 
+async function handleRecruiterCommission(recruiterUid, clientUid, amount) {
+  try {
+    const recruiterDoc = await db.collection("recruiters").doc(recruiterUid).get();
+    if (!recruiterDoc.exists) return;
+
+    const recruiterData = recruiterDoc.data();
+    const commissionPercent = recruiterData.commissionPercent || 25;
+    const commissionAmount = (amount * commissionPercent) / 100;
+
+    // Update recruiter client record
+    const clientRef = db.collection("recruiters").doc(recruiterUid).collection("clients").doc(clientUid);
+    const clientDoc = await clientRef.get();
+    if (clientDoc.exists) {
+      await clientRef.update({
+        paymentStatus: "paid",
+        commissionAmount,
+        paidAt: new Date().toISOString(),
+      });
+    }
+
+    // Update recruiter totals
+    await db.collection("recruiters").doc(recruiterUid).update({
+      totalCommission: admin.firestore.FieldValue.increment(commissionAmount),
+      availableBalance: admin.firestore.FieldValue.increment(commissionAmount),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await logEvent("recruiter_commission", { recruiterUid, clientUid, commissionAmount, commissionPercent });
+  } catch (e) {
+    console.error("handleRecruiterCommission error:", e.message);
+  }
+}
+  const res = await fetch(`https://api.mercadopago.com/v1/payments/${id}`, {
+    headers: { Authorization: `Bearer ${mercadoPagoToken.value()}` },
+  });
+  if (!res.ok) throw new Error(`MP payment ${id} returned ${res.status}`);
+  return res.json();
+}
+
 async function handlePreapproval(dataId) {
   const preapproval = await fetchPreapproval(dataId);
   const email = preapproval.payer_email;
