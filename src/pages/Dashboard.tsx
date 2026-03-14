@@ -255,6 +255,12 @@ const Dashboard = () => {
                   className="h-10 sm:h-11"
                 />
               </div>
+              {profile?.birthDate && (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <Label>Data de nascimento</Label>
+                  <Input value={profile.birthDate} disabled className="h-10 sm:h-11 bg-muted/50" />
+                </div>
+              )}
             </div>
 
             <div className="mt-3 sm:mt-4 space-y-1.5">

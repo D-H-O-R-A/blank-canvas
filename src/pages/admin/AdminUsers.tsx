@@ -476,6 +476,13 @@ const AdminUsers = () => {
                 <Textarea value={editUser.about || ""} onChange={(e) => setEditUser({ ...editUser, about: e.target.value })} rows={3} />
               </div>
 
+              {editUser.birthDate && (
+                <div className="space-y-1">
+                  <Label>Data de nascimento</Label>
+                  <Input value={editUser.birthDate} disabled className="bg-muted/50" />
+                </div>
+              )}
+
               {/* Social Links */}
               <div className="space-y-2">
                 <Label>Redes Sociais</Label>
