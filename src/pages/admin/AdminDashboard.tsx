@@ -15,6 +15,8 @@ interface Stats {
   totalContacts: number;
   unreadContacts: number;
   totalLogs: number;
+  totalRecruiters?: number;
+  pendingWithdrawals?: number;
 }
 
 const AdminDashboard = () => {
