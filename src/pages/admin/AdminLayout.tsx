@@ -13,9 +13,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield, UserCheck, Wallet } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield, UserCheck, Wallet, ExternalLink } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
+import { Link } from "react-router-dom";
 
 const NAV = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
