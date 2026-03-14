@@ -13,13 +13,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield } from "lucide-react";
+import { LayoutDashboard, Users, CreditCard, ScrollText, Mail, LogOut, Shield, UserCheck, Wallet } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { signOut } from "firebase/auth";
 
 const NAV = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Usuários", url: "/admin/users", icon: Users },
+  { title: "Recrutadores", url: "/admin/recruiters", icon: UserCheck },
+  { title: "Saques", url: "/admin/withdrawals", icon: Wallet },
   { title: "Pagamentos", url: "/admin/payments", icon: CreditCard },
   { title: "Logs", url: "/admin/logs", icon: ScrollText },
   { title: "Contatos", url: "/admin/contacts", icon: Mail },

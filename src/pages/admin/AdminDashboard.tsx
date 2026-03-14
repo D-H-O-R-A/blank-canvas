@@ -46,6 +46,7 @@ const AdminDashboard = () => {
 
   const cards = [
     { label: "Total Usuários", value: stats?.totalUsers ?? 0, sub: `${stats?.activeUsers ?? 0} ativos / ${stats?.pendingUsers ?? 0} pendentes`, icon: Users, color: "text-primary" },
+    { label: "Recrutadores", value: stats?.totalRecruiters ?? 0, sub: `${stats?.pendingWithdrawals ?? 0} saques pendentes`, icon: UserCheck, color: "text-violet-500" },
     { label: "Pagamentos", value: stats?.totalPayments ?? 0, sub: `✓${stats?.successPayments ?? 0}  ✗${stats?.failedPayments ?? 0}  ⏳${stats?.pendingPayments ?? 0}`, icon: CreditCard, color: "text-emerald-500" },
     { label: "Contatos", value: stats?.totalContacts ?? 0, sub: `${stats?.unreadContacts ?? 0} não lidos`, icon: Mail, color: "text-blue-500" },
     { label: "Logs", value: stats?.totalLogs ?? 0, sub: "interações registradas", icon: ScrollText, color: "text-orange-500" },
