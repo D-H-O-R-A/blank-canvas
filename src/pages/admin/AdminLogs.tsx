@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { auth } from "@/lib/firebase";
+import AdminPagination from "@/components/AdminPagination";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -16,17 +17,23 @@ interface LogEntry {
 const AdminLogs = () => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const token = await auth.currentUser?.getIdToken();
-        const res = await fetch(`${API_BASE}/admin/logs`, { headers: { Authorization: `Bearer ${token}` } });
-        if (res.ok) setLogs(await res.json());
-      } catch (e) { console.error(e); } finally { setLoading(false); }
-    };
-    load();
-  }, []);
+  const loadLogs = async (p = page) => {
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      const res = await fetch(`${API_BASE}/admin/logs?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const json = await res.json();
+        setLogs(json.data);
+        setTotalPages(json.totalPages);
+        setPage(json.page);
+      }
+    } catch (e) { console.error(e); } finally { setLoading(false); }
+  };
+
+  useEffect(() => { loadLogs(); }, []);
 
   if (loading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
@@ -65,6 +72,7 @@ const AdminLogs = () => {
           </tbody>
         </table>
       </div>
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => loadLogs(p)} />
     </div>
   );
 };

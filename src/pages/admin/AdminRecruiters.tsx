@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Pencil, Trash2, Ban, CheckCircle, Users, Camera, Percent, ShieldCheck } from "lucide-react";
+import AdminPagination from "@/components/AdminPagination";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -40,14 +41,21 @@ const AdminRecruiters = () => {
   const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
   const [editPhotoPreview, setEditPhotoPreview] = useState<string | null>(null);
   const photoRef = useRef<HTMLInputElement>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const getToken = async () => auth.currentUser?.getIdToken();
 
-  const load = async () => {
+  const load = async (p = page) => {
     try {
       const token = await getToken();
-      const res = await fetch(`${API_BASE}/admin/recruiters`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setRecruiters(await res.json());
+      const res = await fetch(`${API_BASE}/admin/recruiters?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const json = await res.json();
+        setRecruiters(json.data);
+        setTotalPages(json.totalPages);
+        setPage(json.page);
+      }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -327,6 +335,7 @@ const AdminRecruiters = () => {
           )}
         </DialogContent>
       </Dialog>
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => load(p)} />
     </div>
   );
 };

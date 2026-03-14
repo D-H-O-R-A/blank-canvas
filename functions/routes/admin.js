@@ -100,9 +100,14 @@ router.get("/admin/stats", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/users -----
 router.get("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("professionals").orderBy("createdAt", "desc").get();
-    const users = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
-    return res.status(200).json(users);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("professionals").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("professionals").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/users GET error:", error);
     await logError(req, error);
@@ -333,6 +338,8 @@ router.put("/admin/users/:uid/block", requireAuth, requireAdmin, async (req, res
 // ----- GET /admin/payments -----
 router.get("/admin/payments", requireAuth, requireAdmin, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
     const usersSnap = await db.collection("professionals").get();
     const payments = [];
 
@@ -354,7 +361,10 @@ router.get("/admin/payments", requireAuth, requireAdmin, async (req, res) => {
     }
 
     payments.sort((a, b) => (b.paidAt || "").localeCompare(a.paidAt || ""));
-    return res.status(200).json(payments);
+    const total = payments.length;
+    const totalPages = Math.ceil(total / limit);
+    const data = payments.slice((page - 1) * limit, page * limit);
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/payments error:", error);
     await logError(req, error);
@@ -365,9 +375,14 @@ router.get("/admin/payments", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/logs -----
 router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("logs").orderBy("timestamp", "desc").limit(500).get();
-    const logs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return res.status(200).json(logs);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("logs").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("logs").orderBy("timestamp", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/logs error:", error);
     await logError(req, error);
@@ -378,9 +393,14 @@ router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/contacts -----
 router.get("/admin/contacts", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("contacts").orderBy("createdAt", "desc").get();
-    const contacts = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return res.status(200).json(contacts);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("contacts").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("contacts").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/contacts error:", error);
     await logError(req, error);
@@ -469,9 +489,14 @@ router.put("/admin/contacts/:id", requireAuth, requireAdmin, async (req, res) =>
 // ----- GET /admin/recruiters -----
 router.get("/admin/recruiters", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("recruiters").orderBy("createdAt", "desc").get();
-    const recruiters = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
-    return res.status(200).json(recruiters);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("recruiters").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("recruiters").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });
@@ -593,6 +618,8 @@ router.post("/admin/recruiters/:uid/photo", requireAuth, requireAdmin, async (re
 // ----- GET /admin/withdrawals -----
 router.get("/admin/withdrawals", requireAuth, requireAdmin, async (req, res) => {
   try {
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
     const recruitersSnap = await db.collection("recruiters").get();
     const withdrawals = [];
     for (const rDoc of recruitersSnap.docs) {
@@ -610,7 +637,10 @@ router.get("/admin/withdrawals", requireAuth, requireAdmin, async (req, res) => 
       }
     }
     withdrawals.sort((a, b) => (b.requestedAt || "").localeCompare(a.requestedAt || ""));
-    return res.status(200).json(withdrawals);
+    const total = withdrawals.length;
+    const totalPages = Math.ceil(total / limit);
+    const data = withdrawals.slice((page - 1) * limit, page * limit);
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });
