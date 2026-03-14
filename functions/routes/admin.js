@@ -489,9 +489,14 @@ router.put("/admin/contacts/:id", requireAuth, requireAdmin, async (req, res) =>
 // ----- GET /admin/recruiters -----
 router.get("/admin/recruiters", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("recruiters").orderBy("createdAt", "desc").get();
-    const recruiters = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
-    return res.status(200).json(recruiters);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("recruiters").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("recruiters").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });
