@@ -375,9 +375,14 @@ router.get("/admin/payments", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/logs -----
 router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("logs").orderBy("timestamp", "desc").limit(500).get();
-    const logs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    return res.status(200).json(logs);
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const countSnap = await db.collection("logs").count().get();
+    const total = countSnap.data().count;
+    const totalPages = Math.ceil(total / limit);
+    const snap = await db.collection("logs").orderBy("timestamp", "desc").offset((page - 1) * limit).limit(limit).get();
+    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/logs error:", error);
     await logError(req, error);
