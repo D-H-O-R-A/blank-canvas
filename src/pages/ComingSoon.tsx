@@ -1,99 +1,86 @@
-import { useState, useEffect, useRef, useMemo } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, MeshDistortMaterial } from "@react-three/drei";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, Rocket, Clock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import * as THREE from "three";
 
-// ==================== 3D Components ====================
+// ==================== Canvas 2D Background ====================
 
-function FloatingSphere({ position, scale, speed, color }: {
-  position: [number, number, number];
-  scale: number;
-  speed: number;
-  color: string;
-}) {
-  const ref = useRef<THREE.Mesh>(null);
+function ParticleBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number>(0);
 
-  useFrame((state) => {
-    if (!ref.current) return;
-    ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * speed) * 0.3;
-    ref.current.rotation.x = state.clock.elapsedTime * speed * 0.2;
-    ref.current.rotation.z = state.clock.elapsedTime * speed * 0.1;
-  });
+  const draw = useCallback((ctx: CanvasRenderingContext2D, w: number, h: number, time: number) => {
+    ctx.clearRect(0, 0, w, h);
 
-  return (
-    <Float speed={speed} rotationIntensity={0.4} floatIntensity={0.6}>
-      <mesh ref={ref} position={position} scale={scale}>
-        <sphereGeometry args={[1, 64, 64]} />
-        <MeshDistortMaterial
-          color={color}
-          transparent
-          opacity={0.35}
-          distort={0.4}
-          speed={2}
-          roughness={0.2}
-        />
-      </mesh>
-    </Float>
-  );
-}
+    // Floating circles
+    const circles = [
+      { x: w * 0.2, y: h * 0.3, r: 120, color: "rgba(0,195,137,0.12)", speed: 0.8 },
+      { x: w * 0.75, y: h * 0.6, r: 80, color: "rgba(0,195,137,0.08)", speed: 1.2 },
+      { x: w * 0.5, y: h * 0.15, r: 150, color: "rgba(1,27,51,0.06)", speed: 0.5 },
+      { x: w * 0.85, y: h * 0.2, r: 60, color: "rgba(0,168,118,0.1)", speed: 1.5 },
+      { x: w * 0.1, y: h * 0.75, r: 90, color: "rgba(0,195,137,0.07)", speed: 1 },
+    ];
 
-function Particles({ count = 80 }: { count?: number }) {
-  const ref = useRef<THREE.Points>(null);
-
-  const positions = useMemo(() => {
-    const pos = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      pos[i * 3] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 1] = (Math.random() - 0.5) * 20;
-      pos[i * 3 + 2] = (Math.random() - 0.5) * 10;
+    for (const c of circles) {
+      const offsetY = Math.sin(time * c.speed * 0.001) * 30;
+      const offsetX = Math.cos(time * c.speed * 0.0007) * 15;
+      ctx.beginPath();
+      ctx.arc(c.x + offsetX, c.y + offsetY, c.r, 0, Math.PI * 2);
+      ctx.fillStyle = c.color;
+      ctx.fill();
     }
-    return pos;
-  }, [count]);
 
-  useFrame((state) => {
-    if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.02;
-    ref.current.rotation.x = state.clock.elapsedTime * 0.01;
-  });
+    // Particles
+    for (let i = 0; i < 60; i++) {
+      const seed = i * 137.508;
+      const px = ((seed * 7.3) % w);
+      const py = ((seed * 13.7) % h);
+      const floatY = Math.sin(time * 0.001 + seed) * 8;
+      const floatX = Math.cos(time * 0.0008 + seed * 0.5) * 5;
+      const alpha = 0.15 + Math.sin(time * 0.002 + seed) * 0.1;
+
+      ctx.beginPath();
+      ctx.arc(px + floatX, py + floatY, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(0,195,137,${alpha})`;
+      ctx.fill();
+    }
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.scale(dpr, dpr);
+    };
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    const loop = (time: number) => {
+      draw(ctx, canvas.offsetWidth, canvas.offsetHeight, time);
+      animationRef.current = requestAnimationFrame(loop);
+    };
+    animationRef.current = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(animationRef.current);
+      window.removeEventListener("resize", resize);
+    };
+  }, [draw]);
 
   return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.04}
-        color="#00C389"
-        transparent
-        opacity={0.6}
-        sizeAttenuation
-      />
-    </points>
-  );
-}
-
-function Scene() {
-  return (
-    <>
-      <ambientLight intensity={0.3} />
-      <directionalLight position={[5, 5, 5]} intensity={0.5} />
-      <pointLight position={[-5, -5, -5]} intensity={0.3} color="#00C389" />
-
-      <FloatingSphere position={[-3, 1.5, -2]} scale={1.2} speed={1.2} color="#00C389" />
-      <FloatingSphere position={[3.5, -1, -3]} scale={0.8} speed={0.8} color="#00a876" />
-      <FloatingSphere position={[0, 2.5, -4]} scale={1.5} speed={0.6} color="#011B33" />
-      <FloatingSphere position={[-4, -2, -1]} scale={0.6} speed={1.5} color="#00C389" />
-      <FloatingSphere position={[5, 0.5, -5]} scale={1} speed={1} color="#00a876" />
-
-      <Particles count={100} />
-    </>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full"
+      style={{ background: "transparent" }}
+    />
   );
 }
 
@@ -135,19 +122,9 @@ const ComingSoon = () => {
 
   return (
     <div className="relative min-h-screen bg-background overflow-hidden flex items-center justify-center">
-      {/* 3D Background */}
+      {/* Canvas 2D Background */}
       <div className="absolute inset-0 z-0">
-        <Canvas
-          camera={{ position: [0, 0, 8], fov: 60 }}
-          dpr={[1, 1.5]}
-          style={{ background: "transparent" }}
-          onCreated={() => {}}
-          fallback={
-            <div className="w-full h-full bg-gradient-to-br from-primary/10 via-background to-primary/5" />
-          }
-        >
-          <Scene />
-        </Canvas>
+        <ParticleBackground />
       </div>
 
       {/* Gradient overlays */}
