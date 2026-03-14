@@ -71,6 +71,7 @@ const App = () => (
               <Route path="logs" element={<AdminLogs />} />
               <Route path="contacts" element={<AdminContacts />} />
               <Route path="admins" element={<AdminAdmins />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
