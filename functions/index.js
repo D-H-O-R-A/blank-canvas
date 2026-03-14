@@ -38,6 +38,7 @@ const { logAction } = require("./middleware/logger");
 const publicRoutes = require("./routes/public");
 const profileRoutes = require("./routes/profile");
 const adminRoutes = require("./routes/admin");
+const webhookApp = require("./webhook");
 
 // Express app
 const app = express();
@@ -75,5 +76,6 @@ app.use(publicRoutes);
 app.use(profileRoutes);
 app.use(adminRoutes);
 
-// Export como função HTTP única (2nd gen) com acesso ao secret do MP
+// Export como funções HTTP (2nd gen) com acesso ao secret do MP
 exports.api = onRequest({ secrets: [mercadoPagoToken] }, app);
+exports.webhook = onRequest({ secrets: [mercadoPagoToken] }, webhookApp);

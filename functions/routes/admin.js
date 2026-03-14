@@ -47,7 +47,7 @@ const { requireAdmin } = require("../middleware/admin");
 router.get("/admin/check", requireAuth, async (req, res) => {
   try {
     const doc = await db.collection("admin").doc(req.uid).get();
-    return res.status(200).json({ isAdmin: doc.exists && doc.data().isAdmin === true });
+    return res.status(200).json({ isAdmin: doc.exists && doc.data().isadmin === true });
   } catch (error) {
     console.error("admin/check error:", error);
     return res.status(500).json({ isAdmin: false });
@@ -235,7 +235,7 @@ router.get("/admin/contacts", requireAuth, requireAdmin, async (req, res) => {
 // ----- GET /admin/admins -----
 router.get("/admin/admins", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const snap = await db.collection("admin").where("isAdmin", "==", true).get();
+    const snap = await db.collection("admin").where("isadmin", "==", true).get();
     const admins = [];
     for (const doc of snap.docs) {
       let email = "";
@@ -265,7 +265,7 @@ router.post("/admin/admins", requireAuth, requireAdmin, async (req, res) => {
       return res.status(404).json({ error: "Usuário não encontrado com este e-mail" });
     }
 
-    await db.collection("admin").doc(userRecord.uid).set({ isAdmin: true }, { merge: true });
+    await db.collection("admin").doc(userRecord.uid).set({ isadmin: true }, { merge: true });
     return res.status(200).json({ ok: true, uid: userRecord.uid });
   } catch (error) {
     console.error("admin/admins POST error:", error);
