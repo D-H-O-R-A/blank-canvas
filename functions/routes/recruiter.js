@@ -64,6 +64,7 @@ router.post("/recruiter/register", async (req, res) => {
       totalCommission: 0,
       availableBalance: 0,
       blocked: false,
+      approved: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
