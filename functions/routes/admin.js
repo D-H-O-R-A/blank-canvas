@@ -104,7 +104,7 @@ router.get("/admin/users", requireAuth, requireAdmin, async (req, res) => {
 // ----- POST /admin/users -----
 router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const { name, email, password, whatsapp, profession, plan, paymentMethod, nextBillingMonths } = req.body;
+    const { name, email, password, whatsapp, profession, plan, paymentMethod, paidUntil, nextBillingMonths } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios" });
@@ -115,10 +115,15 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
 
     const userRecord = await admin.auth().createUser({ email, password, displayName: name });
 
-    const now = new Date();
-    const months = nextBillingMonths || (plan === "6 meses" ? 6 : 1);
-    const paidUntil = new Date(now);
-    paidUntil.setMonth(paidUntil.getMonth() + months);
+    // Use paidUntil directly if provided, otherwise compute from months
+    let paidUntilDate;
+    if (paidUntil) {
+      paidUntilDate = new Date(paidUntil);
+    } else {
+      const months = nextBillingMonths || (plan === "6 meses" ? 6 : 1);
+      paidUntilDate = new Date();
+      paidUntilDate.setMonth(paidUntilDate.getMonth() + months);
+    }
 
     await db.collection("professionals").doc(userRecord.uid).set({
       name,
@@ -128,11 +133,12 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
       plan: plan || "1 mês",
       subscriptionStatus: "active",
       about: "",
+      photoURL: "",
       socialLinks: { instagram: "", facebook: "", linkedin: "", website: "" },
       paymentMethod: paymentMethod || "pix",
       totalPayments: 1,
-      nextBillingMonths: months,
-      paidUntil: paidUntil.toISOString(),
+      nextBillingMonths: nextBillingMonths || (plan === "6 meses" ? 6 : 1),
+      paidUntil: paidUntilDate.toISOString(),
       blocked: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -152,7 +158,7 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
 router.put("/admin/users/:uid", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { uid } = req.params;
-    const allowedFields = ["name", "whatsapp", "profession", "about", "plan", "subscriptionStatus", "paidUntil", "socialLinks", "paymentMethod", "totalPayments", "nextBillingMonths", "blocked"];
+    const allowedFields = ["name", "whatsapp", "profession", "about", "plan", "subscriptionStatus", "paidUntil", "socialLinks", "paymentMethod", "totalPayments", "nextBillingMonths", "blocked", "photoURL"];
     const updateData = { updatedAt: admin.firestore.FieldValue.serverTimestamp() };
 
     for (const field of allowedFields) {
@@ -162,10 +168,53 @@ router.put("/admin/users/:uid", requireAuth, requireAdmin, async (req, res) => {
     }
 
     await db.collection("professionals").doc(uid).update(updateData);
+
+    // Sync displayName to Auth if name changed
+    if (req.body.name) {
+      try { await admin.auth().updateUser(uid, { displayName: req.body.name }); } catch (e) { /* ignore */ }
+    }
+
     await logAdminAction(req, "user_updated", { targetUid: uid, fields: Object.keys(updateData) });
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("admin/users PUT error:", error);
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- POST /admin/users/:uid/photo -----
+router.post("/admin/users/:uid/photo", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const { uid } = req.params;
+    const { photo, contentType } = req.body;
+
+    if (!photo) return res.status(400).json({ error: "Foto não enviada" });
+
+    const bucket = admin.storage().bucket();
+    const ext = contentType === "image/png" ? "png" : "jpg";
+    const filePath = `profile-photos/${uid}.${ext}`;
+    const file = bucket.file(filePath);
+
+    const buffer = Buffer.from(photo, "base64");
+    await file.save(buffer, {
+      metadata: { contentType: contentType || "image/jpeg" },
+      public: true,
+    });
+
+    const photoURL = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+    // Update Auth + Firestore
+    await admin.auth().updateUser(uid, { photoURL });
+    await db.collection("professionals").doc(uid).update({
+      photoURL,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    await logAdminAction(req, "user_photo_updated", { targetUid: uid });
+    return res.status(200).json({ ok: true, photoURL });
+  } catch (error) {
+    console.error("admin/users photo error:", error);
     await logError(req, error);
     return res.status(500).json({ error: error.message });
   }
@@ -205,21 +254,26 @@ router.delete("/admin/users/:uid", requireAuth, requireAdmin, async (req, res) =
 router.post("/admin/users/:uid/renew", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { uid } = req.params;
-    const { months, paymentMethod } = req.body;
+    const { months, paidUntil, paymentMethod } = req.body;
 
     const doc = await db.collection("professionals").doc(uid).get();
     if (!doc.exists) return res.status(404).json({ error: "Usuário não encontrado" });
 
     const data = doc.data();
-    const renewMonths = months || data.nextBillingMonths || 1;
 
-    const now = new Date();
-    const paidUntil = new Date(now);
-    paidUntil.setMonth(paidUntil.getMonth() + renewMonths);
+    // Use paidUntil directly if provided, otherwise compute from months
+    let paidUntilDate;
+    if (paidUntil) {
+      paidUntilDate = new Date(paidUntil);
+    } else {
+      const renewMonths = months || data.nextBillingMonths || 1;
+      paidUntilDate = new Date();
+      paidUntilDate.setMonth(paidUntilDate.getMonth() + renewMonths);
+    }
 
     await db.collection("professionals").doc(uid).update({
       subscriptionStatus: "active",
-      paidUntil: paidUntil.toISOString(),
+      paidUntil: paidUntilDate.toISOString(),
       totalPayments: (data.totalPayments || 0) + 1,
       paymentMethod: paymentMethod || data.paymentMethod || "pix",
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -233,13 +287,13 @@ router.post("/admin/users/:uid/renew", requireAuth, requireAdmin, async (req, re
       amount: null,
       paymentMethod: paymentMethod || data.paymentMethod || "pix",
       paidAt: new Date().toISOString(),
-      paidUntil: paidUntil.toISOString(),
+      paidUntil: paidUntilDate.toISOString(),
       renewedBy: req.uid,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    await logAdminAction(req, "user_renewed", { targetUid: uid, months: renewMonths, paymentMethod });
-    return res.status(200).json({ ok: true, paidUntil: paidUntil.toISOString() });
+    await logAdminAction(req, "user_renewed", { targetUid: uid, paidUntil: paidUntilDate.toISOString(), paymentMethod });
+    return res.status(200).json({ ok: true, paidUntil: paidUntilDate.toISOString() });
   } catch (error) {
     console.error("admin/users renew error:", error);
     await logError(req, error);
