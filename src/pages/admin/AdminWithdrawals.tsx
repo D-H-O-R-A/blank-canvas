@@ -3,7 +3,8 @@ import { auth } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Clock, Upload, Download, Image } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Upload, Download } from "lucide-react";
+import AdminPagination from "@/components/AdminPagination";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -30,14 +31,21 @@ const AdminWithdrawals = () => {
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
   const receiptRef = useRef<HTMLInputElement>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const getToken = async () => auth.currentUser?.getIdToken();
 
-  const load = async () => {
+  const load = async (p = page) => {
     try {
       const token = await getToken();
-      const res = await fetch(`${API_BASE}/admin/withdrawals`, { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setWithdrawals(await res.json());
+      const res = await fetch(`${API_BASE}/admin/withdrawals?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
+      if (res.ok) {
+        const json = await res.json();
+        setWithdrawals(json.data);
+        setTotalPages(json.totalPages);
+        setPage(json.page);
+      }
     } catch (e) { console.error(e); }
     finally { setLoading(false); }
   };
@@ -69,7 +77,7 @@ const AdminWithdrawals = () => {
       setApproveItem(null);
       setReceiptFile(null);
       setReceiptPreview(null);
-      load();
+      load(page);
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
     } finally { setSaving(false); }
@@ -125,6 +133,8 @@ const AdminWithdrawals = () => {
           ))}
         </div>
       )}
+
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => load(p)} />
 
       {/* Approve Dialog */}
       <Dialog open={!!approveItem} onOpenChange={(open) => { if (!open) { setApproveItem(null); setReceiptFile(null); setReceiptPreview(null); } }}>

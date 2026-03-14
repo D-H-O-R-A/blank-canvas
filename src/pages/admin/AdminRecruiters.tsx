@@ -335,6 +335,7 @@ const AdminRecruiters = () => {
           )}
         </DialogContent>
       </Dialog>
+      <AdminPagination page={page} totalPages={totalPages} onPageChange={(p) => load(p)} />
     </div>
   );
 };
