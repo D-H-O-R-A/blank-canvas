@@ -357,15 +357,20 @@ export const ProfessionalSection = () => {
                     )}
                   </Button>
 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="lg"
+                    className="w-full"
+                    onClick={() => { setIsModalOpen(false); navigate("/login"); }}
+                  >
+                    Já tenho conta — Fazer Login
+                  </Button>
+
                   <p className="text-xs text-muted-foreground text-center">
-                    Já tem uma conta?{" "}
-                    <button type="button" className="text-primary hover:underline font-medium" onClick={() => { setIsModalOpen(false); navigate("/login"); }}>
-                      Faça login
-                    </button>
-                    {" · "}
                     Ao continuar, você concorda com nossos{" "}
-                    <a href="#" className="text-primary hover:underline font-medium">Termos de Uso</a> e{" "}
-                    <a href="#" className="text-primary hover:underline font-medium">Política de Privacidade</a>.
+                    <a href="/termos-de-uso" className="text-primary hover:underline font-medium">Termos de Uso</a> e{" "}
+                    <a href="/politica-de-privacidade" className="text-primary hover:underline font-medium">Política de Privacidade</a>.
                   </p>
                 </form>
               </DialogContent>
