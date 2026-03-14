@@ -47,7 +47,7 @@ const { requireAdmin } = require("../middleware/admin");
 router.get("/admin/check", requireAuth, async (req, res) => {
   try {
     const doc = await db.collection("admin").doc(req.uid).get();
-    return res.status(200).json({ isAdmin: doc.exists && doc.data().isAdmin === true });
+    return res.status(200).json({ isAdmin: doc.exists && doc.data().isadmin === true });
   } catch (error) {
     console.error("admin/check error:", error);
     return res.status(500).json({ isAdmin: false });
