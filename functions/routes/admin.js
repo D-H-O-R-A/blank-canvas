@@ -104,7 +104,7 @@ router.get("/admin/users", requireAuth, requireAdmin, async (req, res) => {
 // ----- POST /admin/users -----
 router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   try {
-    const { name, email, password, whatsapp, profession, plan, paymentMethod, paidUntil, nextBillingMonths } = req.body;
+    const { name, email, password, whatsapp, profession, plan, paymentMethod, paidUntil, nextBillingMonths, birthDate } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios" });
@@ -115,7 +115,6 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
 
     const userRecord = await admin.auth().createUser({ email, password, displayName: name });
 
-    // Use paidUntil directly if provided, otherwise compute from months
     let paidUntilDate;
     if (paidUntil) {
       paidUntilDate = new Date(paidUntil);
@@ -126,11 +125,11 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
     }
 
     await db.collection("professionals").doc(userRecord.uid).set({
-      name,
-      email,
+      name, email,
       whatsapp: whatsapp || "",
       profession: profession || "",
       plan: plan || "1 mês",
+      birthDate: birthDate || null,
       subscriptionStatus: "active",
       about: "",
       photoURL: "",
@@ -145,7 +144,6 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
     });
 
     await logAdminAction(req, "user_created", { targetUid: userRecord.uid, email, plan, paymentMethod });
-
     return res.status(200).json({ ok: true, uid: userRecord.uid });
   } catch (error) {
     console.error("admin/users POST error:", error);
