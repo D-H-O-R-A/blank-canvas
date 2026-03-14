@@ -102,7 +102,7 @@ const AdminUsers = () => {
       if (!res.ok) throw new Error((await res.json()).error);
       toast({ title: "Usuário criado!" });
       setCreateOpen(false);
-      setNewUser({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined });
+      setNewUser({ name: "", email: "", password: "", whatsapp: "", profession: "", plan: "1 mês", paymentMethod: "pix", paidUntilDate: undefined, birthDate: "" });
       loadUsers();
     } catch (e: any) {
       toast({ title: "Erro", description: e.message, variant: "destructive" });
