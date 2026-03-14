@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Pencil, Trash2, Ban, CheckCircle, Users, Camera, Percent, ShieldCheck } from "lucide-react";
+import AdminPagination from "@/components/AdminPagination";
 
 const API_BASE = "https://us-central1-click-servico.cloudfunctions.net/api";
 
