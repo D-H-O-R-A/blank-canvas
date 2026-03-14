@@ -1,0 +1,11 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      // Public read for photos/receipts (URLs shared in app)
+      allow read: if true;
+      // All writes go through backend Admin SDK
+      allow write: if false;
+    }
+  }
+}
