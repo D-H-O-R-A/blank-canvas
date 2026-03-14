@@ -33,6 +33,7 @@ interface Profile {
   plan: string;
   subscriptionStatus: string;
   paidUntil: string | null;
+  birthDate?: string;
 }
 
 const PLANS = [
