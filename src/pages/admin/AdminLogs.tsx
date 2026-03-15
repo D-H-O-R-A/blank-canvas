@@ -20,7 +20,8 @@ const AdminLogs = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const loadLogs = async (p = page) => {
+  const loadLogs = async (p: number = 1) => {
+    setLoading(true);
     try {
       const token = await auth.currentUser?.getIdToken();
       const res = await fetch(`${API_BASE}/admin/logs?page=${p}&limit=20`, { headers: { Authorization: `Bearer ${token}` } });
@@ -33,13 +34,14 @@ const AdminLogs = () => {
     } catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
-  useEffect(() => { loadLogs(); }, []);
+  useEffect(() => { loadLogs(1); }, []);
 
-  if (loading) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
+  if (loading && logs.length === 0) return <div className="flex justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" /></div>;
 
   const methodColor = (m: string) => {
     if (m === "POST") return "bg-blue-500/20 text-blue-600";
     if (m === "PUT") return "bg-orange-500/20 text-orange-600";
+    if (m === "DELETE") return "bg-red-500/20 text-red-600";
     return "bg-muted text-muted-foreground";
   };
 
