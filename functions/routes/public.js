@@ -9,21 +9,41 @@ const router = express.Router();
 const { admin, db, mercadoPagoToken, APP_BASE_URL, PLAN_CONFIG } = require("../config");
 const { logError } = require("../middleware/logger");
 
+// ===================== VALIDATION HELPERS =====================
+
+function validateEmail(email) {
+  if (!email || email.length > 255) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 11;
+}
+
+function validateName(name) {
+  return name && name.trim().length >= 2 && name.trim().length <= 100;
+}
+
+function validatePassword(password) {
+  return password && password.length >= 6 && password.length <= 128;
+}
+
 // ----- POST /register -----
 router.post("/register", async (req, res) => {
   try {
     const { name, email, whatsapp, profession, password, plan, birthDate } = req.body;
 
-    if (!name || !email || !password || !plan || !whatsapp) {
-      return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: "A senha deve ter pelo menos 6 caracteres" });
-    }
+    if (!validateName(name)) return res.status(400).json({ error: "Nome deve ter entre 2 e 100 caracteres" });
+    if (!validateEmail(email)) return res.status(400).json({ error: "E-mail inválido (máx. 255 caracteres)" });
+    if (!validatePassword(password)) return res.status(400).json({ error: "Senha deve ter entre 6 e 128 caracteres" });
+    if (!plan) return res.status(400).json({ error: "Plano é obrigatório" });
+    if (!whatsapp || !validatePhone(whatsapp)) return res.status(400).json({ error: "WhatsApp inválido (10-11 dígitos)" });
+    if (profession && profession.length > 100) return res.status(400).json({ error: "Profissão muito longa (máx. 100 caracteres)" });
 
     let userRecord;
     try {
-      userRecord = await admin.auth().createUser({ email, password, displayName: name });
+      userRecord = await admin.auth().createUser({ email: email.trim(), password, displayName: name.trim() });
     } catch (authError) {
       if (authError.code === "auth/email-already-exists") {
         return res.status(409).json({ error: "E-mail já cadastrado. Faça login.", code: "EMAIL_EXISTS" });
@@ -35,10 +55,10 @@ router.post("/register", async (req, res) => {
     const selectedPlan = PLAN_CONFIG[plan] || PLAN_CONFIG["1 mês"];
 
     await db.collection("professionals").doc(uid).set({
-      name,
-      email,
-      whatsapp,
-      profession: profession || "",
+      name: name.trim(),
+      email: email.trim(),
+      whatsapp: whatsapp.trim(),
+      profession: (profession || "").trim().slice(0, 100),
       plan,
       birthDate: birthDate || null,
       subscriptionStatus: "pending",
@@ -64,7 +84,7 @@ router.post("/register", async (req, res) => {
           transaction_amount: selectedPlan.amount,
           currency_id: "BRL",
         },
-        payer_email: email,
+        payer_email: email.trim(),
         back_url: `${APP_BASE_URL}/pagamento-sucesso`,
         external_reference: uid,
       }),
@@ -91,12 +111,11 @@ router.post("/contact", async (req, res) => {
   try {
     const { name, email, phone, subject, message } = req.body;
 
-    if (!name || !email || !subject || !message) {
-      return res.status(400).json({ error: "Preencha nome, e-mail, assunto e mensagem" });
-    }
-    if (name.length > 100 || email.length > 255 || message.length > 1000) {
-      return res.status(400).json({ error: "Dados excedem o tamanho máximo permitido" });
-    }
+    if (!validateName(name)) return res.status(400).json({ error: "Nome deve ter entre 2 e 100 caracteres" });
+    if (!validateEmail(email)) return res.status(400).json({ error: "E-mail inválido" });
+    if (!subject || subject.length > 100) return res.status(400).json({ error: "Assunto inválido" });
+    if (!message || message.trim().length < 5 || message.length > 1000) return res.status(400).json({ error: "Mensagem deve ter entre 5 e 1000 caracteres" });
+    if (phone && phone.length > 20) return res.status(400).json({ error: "Telefone inválido" });
 
     const docRef = await db.collection("contacts").add({
       name: name.trim(),
@@ -104,6 +123,7 @@ router.post("/contact", async (req, res) => {
       phone: (phone || "").trim(),
       subject: subject.trim(),
       message: message.trim(),
+      status: "pending",
       read: false,
       createdAt: new Date().toISOString(),
     });

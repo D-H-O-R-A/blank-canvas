@@ -11,9 +11,44 @@ const { requireAuth } = require("../middleware/auth");
 const { requireAdmin } = require("../middleware/admin");
 const { logError } = require("../middleware/logger");
 
-/**
- * Helper: registra ação administrativa nos logs.
- */
+// ===================== VALIDATION HELPERS =====================
+
+function validateCPF(cpf) {
+  const cleaned = cpf.replace(/\D/g, "");
+  if (cleaned.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cleaned)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(cleaned[i]) * (10 - i);
+  let check = 11 - (sum % 11);
+  if (check >= 10) check = 0;
+  if (parseInt(cleaned[9]) !== check) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(cleaned[i]) * (11 - i);
+  check = 11 - (sum % 11);
+  if (check >= 10) check = 0;
+  return parseInt(cleaned[10]) === check;
+}
+
+function validateEmail(email) {
+  if (!email || email.length > 255) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 11;
+}
+
+function validateName(name) {
+  return name && name.trim().length >= 2 && name.trim().length <= 100;
+}
+
+function validatePassword(password) {
+  return password && password.length >= 6 && password.length <= 128;
+}
+
+// ===================== ADMIN ACTION LOG =====================
+
 async function logAdminAction(req, action, details = {}) {
   try {
     await db.collection("logs").add({
@@ -71,12 +106,12 @@ router.get("/admin/stats", requireAuth, requireAdmin, async (req, res) => {
     const contactsSnap = await db.collection("contacts").get();
     let unreadContacts = 0;
     for (const doc of contactsSnap.docs) {
-      if (!doc.data().read) unreadContacts++;
+      const status = doc.data().status || (doc.data().read ? "responded" : "pending");
+      if (status === "pending") unreadContacts++;
     }
 
     const logsSnap = await db.collection("logs").get();
 
-    // Recruiter stats
     const recruitersSnap = await db.collection("recruiters").get();
     let pendingWithdrawals = 0;
     for (const rDoc of recruitersSnap.docs) {
@@ -84,11 +119,19 @@ router.get("/admin/stats", requireAuth, requireAdmin, async (req, res) => {
       pendingWithdrawals += wSnap.size;
     }
 
+    // Latest 5 users and recruiters
+    const latestUsersSnap = await db.collection("professionals").orderBy("createdAt", "desc").limit(5).get();
+    const latestUsers = latestUsersSnap.docs.map((d) => ({ uid: d.id, name: d.data().name, email: d.data().email, createdAt: d.data().createdAt }));
+
+    const latestRecruitersSnap = await db.collection("recruiters").orderBy("createdAt", "desc").limit(5).get();
+    const latestRecruiters = latestRecruitersSnap.docs.map((d) => ({ uid: d.id, name: d.data().name, email: d.data().email, approved: d.data().approved, createdAt: d.data().createdAt }));
+
     return res.status(200).json({
       totalUsers: userDocs.length, activeUsers, pendingUsers, blockedUsers,
       totalPayments, successPayments, failedPayments, pendingPayments: pendingPaymentsCount,
       totalContacts: contactsSnap.size, unreadContacts, totalLogs: logsSnap.size,
       totalRecruiters: recruitersSnap.size, pendingWithdrawals,
+      latestUsers, latestRecruiters,
     });
   } catch (error) {
     console.error("admin/stats error:", error);
@@ -120,14 +163,12 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { name, email, password, whatsapp, profession, plan, paymentMethod, paidUntil, nextBillingMonths, birthDate } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ error: "Nome, e-mail e senha são obrigatórios" });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Senha deve ter pelo menos 6 caracteres" });
-    }
+    if (!validateName(name)) return res.status(400).json({ error: "Nome deve ter entre 2 e 100 caracteres" });
+    if (!validateEmail(email)) return res.status(400).json({ error: "E-mail inválido (máx. 255 caracteres)" });
+    if (!validatePassword(password)) return res.status(400).json({ error: "Senha deve ter entre 6 e 128 caracteres" });
+    if (whatsapp && !validatePhone(whatsapp)) return res.status(400).json({ error: "WhatsApp inválido (10-11 dígitos)" });
 
-    const userRecord = await admin.auth().createUser({ email, password, displayName: name });
+    const userRecord = await admin.auth().createUser({ email: email.trim(), password, displayName: name.trim() });
 
     let paidUntilDate;
     if (paidUntil) {
@@ -139,9 +180,9 @@ router.post("/admin/users", requireAuth, requireAdmin, async (req, res) => {
     }
 
     await db.collection("professionals").doc(userRecord.uid).set({
-      name, email,
-      whatsapp: whatsapp || "",
-      profession: profession || "",
+      name: name.trim(), email: email.trim(),
+      whatsapp: (whatsapp || "").trim(),
+      profession: (profession || "").trim().slice(0, 100),
       plan: plan || "1 mês",
       birthDate: birthDate || null,
       subscriptionStatus: "active",
@@ -179,9 +220,12 @@ router.put("/admin/users/:uid", requireAuth, requireAdmin, async (req, res) => {
       }
     }
 
+    // Validate fields if present
+    if (req.body.name && !validateName(req.body.name)) return res.status(400).json({ error: "Nome inválido" });
+    if (req.body.whatsapp && !validatePhone(req.body.whatsapp)) return res.status(400).json({ error: "WhatsApp inválido" });
+
     await db.collection("professionals").doc(uid).update(updateData);
 
-    // Sync displayName to Auth if name changed
     if (req.body.name) {
       try { await admin.auth().updateUser(uid, { displayName: req.body.name }); } catch (e) { /* ignore */ }
     }
@@ -202,6 +246,7 @@ router.post("/admin/users/:uid/photo", requireAuth, requireAdmin, async (req, re
     const { photo, contentType } = req.body;
 
     if (!photo) return res.status(400).json({ error: "Foto não enviada" });
+    if (photo.length > 5 * 1024 * 1024) return res.status(400).json({ error: "Foto muito grande (máx 5MB)" });
 
     const bucket = admin.storage().bucket();
     const ext = contentType === "image/png" ? "png" : "jpg";
@@ -216,7 +261,6 @@ router.post("/admin/users/:uid/photo", requireAuth, requireAdmin, async (req, re
 
     const photoURL = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
 
-    // Update Auth + Firestore
     await admin.auth().updateUser(uid, { photoURL });
     await db.collection("professionals").doc(uid).update({
       photoURL,
@@ -237,16 +281,13 @@ router.delete("/admin/users/:uid", requireAuth, requireAdmin, async (req, res) =
   try {
     const { uid } = req.params;
 
-    // Deletar subcollections de payments
     const paymentsSnap = await db.collection("professionals").doc(uid).collection("payments").get();
     const batch = db.batch();
     paymentsSnap.docs.forEach((doc) => batch.delete(doc.ref));
     await batch.commit();
 
-    // Deletar documento do Firestore
     await db.collection("professionals").doc(uid).delete();
 
-    // Deletar usuário do Firebase Auth
     try {
       await admin.auth().deleteUser(uid);
     } catch (e) {
@@ -273,7 +314,6 @@ router.post("/admin/users/:uid/renew", requireAuth, requireAdmin, async (req, re
 
     const data = doc.data();
 
-    // Use paidUntil directly if provided, otherwise compute from months
     let paidUntilDate;
     if (paidUntil) {
       paidUntilDate = new Date(paidUntil);
@@ -291,7 +331,6 @@ router.post("/admin/users/:uid/renew", requireAuth, requireAdmin, async (req, re
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    // Registrar pagamento manual
     await db.collection("professionals").doc(uid).collection("payments").add({
       type: "manual_renewal",
       status: "active",
@@ -325,6 +364,9 @@ router.put("/admin/users/:uid/block", requireAuth, requireAdmin, async (req, res
       blocked,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
+
+    // Also disable/enable in Firebase Auth
+    try { await admin.auth().updateUser(uid, { disabled: blocked }); } catch (e) { console.warn("Auth disable error:", e.message); }
 
     await logAdminAction(req, blocked ? "user_blocked" : "user_unblocked", { targetUid: uid });
     return res.status(200).json({ ok: true, blocked });
@@ -377,11 +419,15 @@ router.get("/admin/logs", requireAuth, requireAdmin, async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
-    const countSnap = await db.collection("logs").count().get();
-    const total = countSnap.data().count;
+
+    // Get all logs, sort in-memory (timestamp is a string field, not Firestore timestamp)
+    const allSnap = await db.collection("logs").get();
+    const allLogs = allSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    allLogs.sort((a, b) => (b.timestamp || "").localeCompare(a.timestamp || ""));
+
+    const total = allLogs.length;
     const totalPages = Math.ceil(total / limit);
-    const snap = await db.collection("logs").orderBy("timestamp", "desc").offset((page - 1) * limit).limit(limit).get();
-    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const data = allLogs.slice((page - 1) * limit, page * limit);
     return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/logs error:", error);
@@ -399,7 +445,15 @@ router.get("/admin/contacts", requireAuth, requireAdmin, async (req, res) => {
     const total = countSnap.data().count;
     const totalPages = Math.ceil(total / limit);
     const snap = await db.collection("contacts").orderBy("createdAt", "desc").offset((page - 1) * limit).limit(limit).get();
-    const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const data = snap.docs.map((doc) => {
+      const d = doc.data();
+      return {
+        id: doc.id,
+        ...d,
+        // Migrate old boolean read to status
+        status: d.status || (d.read ? "responded" : "pending"),
+      };
+    });
     return res.status(200).json({ data, total, page, limit, totalPages });
   } catch (error) {
     console.error("admin/contacts error:", error);
@@ -473,9 +527,13 @@ router.delete("/admin/admins/:uid", requireAuth, requireAdmin, async (req, res) 
 router.put("/admin/contacts/:id", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
-    const { read } = req.body;
-    await db.collection("contacts").doc(id).update({ read: !!read });
-    await logAdminAction(req, "contact_updated", { contactId: id, read: !!read });
+    const { status } = req.body;
+    const validStatuses = ["pending", "responded", "ignored"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Status inválido. Use: pending, responded ou ignored" });
+    }
+    await db.collection("contacts").doc(id).update({ status, read: status !== "pending" });
+    await logAdminAction(req, "contact_updated", { contactId: id, status });
     return res.status(200).json({ ok: true });
   } catch (error) {
     console.error("admin/contacts PUT error:", error);
@@ -512,6 +570,10 @@ router.put("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res)
     for (const field of allowed) {
       if (req.body[field] !== undefined) updateData[field] = req.body[field];
     }
+
+    if (req.body.name && !validateName(req.body.name)) return res.status(400).json({ error: "Nome inválido" });
+    if (req.body.whatsapp && !validatePhone(req.body.whatsapp)) return res.status(400).json({ error: "WhatsApp inválido" });
+
     await db.collection("recruiters").doc(uid).update(updateData);
     await logAdminAction(req, "recruiter_updated", { targetUid: uid, fields: Object.keys(updateData) });
     return res.status(200).json({ ok: true });
@@ -525,7 +587,6 @@ router.put("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res)
 router.delete("/admin/recruiters/:uid", requireAuth, requireAdmin, async (req, res) => {
   try {
     const { uid } = req.params;
-    // Delete subcollections
     const clientsSnap = await db.collection("recruiters").doc(uid).collection("clients").get();
     const withdrawalsSnap = await db.collection("recruiters").doc(uid).collection("withdrawals").get();
     const batch = db.batch();
@@ -566,6 +627,10 @@ router.put("/admin/recruiters/:uid/block", requireAuth, requireAdmin, async (req
     if (!doc.exists) return res.status(404).json({ error: "Recrutador não encontrado" });
     const blocked = !doc.data().blocked;
     await db.collection("recruiters").doc(uid).update({ blocked, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
+
+    // Also disable/enable in Firebase Auth
+    try { await admin.auth().updateUser(uid, { disabled: blocked }); } catch (e) { console.warn("Auth disable error:", e.message); }
+
     await logAdminAction(req, blocked ? "recruiter_blocked" : "recruiter_unblocked", { targetUid: uid });
     return res.status(200).json({ ok: true, blocked });
   } catch (error) {
@@ -593,6 +658,7 @@ router.post("/admin/recruiters/:uid/photo", requireAuth, requireAdmin, async (re
     const { uid } = req.params;
     const { photo, contentType } = req.body;
     if (!photo) return res.status(400).json({ error: "Foto não enviada" });
+    if (photo.length > 5 * 1024 * 1024) return res.status(400).json({ error: "Foto muito grande (máx 5MB)" });
 
     const bucket = admin.storage().bucket();
     const ext = contentType === "image/png" ? "png" : "jpg";
@@ -663,7 +729,6 @@ router.put("/admin/withdrawals/:recruiterUid/:id", requireAuth, requireAdmin, as
       processedBy: req.uid,
     };
 
-    // Upload receipt if approving
     if (status === "approved" && receipt) {
       const bucket = admin.storage().bucket();
       const ext = receiptContentType === "image/png" ? "png" : "jpg";
@@ -676,7 +741,6 @@ router.put("/admin/withdrawals/:recruiterUid/:id", requireAuth, requireAdmin, as
 
     await db.collection("recruiters").doc(recruiterUid).collection("withdrawals").doc(id).update(updateData);
 
-    // If rejected, refund the balance
     if (status === "rejected") {
       const wDoc = await db.collection("recruiters").doc(recruiterUid).collection("withdrawals").doc(id).get();
       const amount = wDoc.data().amount || 0;

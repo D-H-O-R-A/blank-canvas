@@ -3,10 +3,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Eye, EyeOff, UserPlus, Camera, Loader2 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { validateCPF, validateEmail, validatePhone, validateName, validatePassword, formatCPF, formatPhone } from "@/lib/validators";
 
 const API_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -24,20 +24,33 @@ const RecruiterRegister = () => {
   });
 
   const handlePhotoSelect = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      toast({ title: "Foto muito grande (máx 5MB)", variant: "destructive" });
+      return;
+    }
     setPhotoFile(file);
     const reader = new FileReader();
     reader.onload = (e) => setPhotoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
   };
 
+  const validate = (): string | null => {
+    if (!validateName(form.name)) return "Nome deve ter entre 2 e 100 caracteres.";
+    if (!validateEmail(form.email)) return "E-mail inválido.";
+    if (!validatePassword(form.password)) return "Senha deve ter entre 6 e 128 caracteres.";
+    if (!validatePhone(form.whatsapp)) return "WhatsApp inválido (10-11 dígitos).";
+    if (!validateCPF(form.cpf)) return "CPF inválido.";
+    if (!form.pixKey.trim() || form.pixKey.trim().length < 5) return "Chave PIX deve ter pelo menos 5 caracteres.";
+    if (form.address.length > 200) return "Endereço muito longo (máx 200 caracteres).";
+    if (form.profession.length > 100) return "Profissão muito longa (máx 100 caracteres).";
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.email || !form.password || !form.whatsapp || !form.cpf || !form.pixKey) {
-      toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
-      return;
-    }
-    if (form.password.length < 6) {
-      toast({ title: "Senha deve ter pelo menos 6 caracteres", variant: "destructive" });
+    const error = validate();
+    if (error) {
+      toast({ title: error, variant: "destructive" });
       return;
     }
 
@@ -110,19 +123,19 @@ const RecruiterRegister = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label>Nome completo *</Label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Seu nome" className="h-11" required />
+                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value.slice(0, 100) })} placeholder="Seu nome" className="h-11" required maxLength={100} />
               </div>
               <div className="space-y-1.5">
                 <Label>E-mail *</Label>
-                <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="email@exemplo.com" className="h-11" required />
+                <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value.slice(0, 255) })} placeholder="email@exemplo.com" className="h-11" required maxLength={255} />
               </div>
               <div className="space-y-1.5">
                 <Label>WhatsApp *</Label>
-                <Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: e.target.value })} placeholder="(11) 99999-9999" className="h-11" required />
+                <Input value={form.whatsapp} onChange={(e) => setForm({ ...form, whatsapp: formatPhone(e.target.value) })} placeholder="(11) 99999-9999" className="h-11" required maxLength={16} />
               </div>
               <div className="space-y-1.5">
                 <Label>Profissão</Label>
-                <Input value={form.profession} onChange={(e) => setForm({ ...form, profession: e.target.value })} placeholder="Ex: Vendedor" className="h-11" />
+                <Input value={form.profession} onChange={(e) => setForm({ ...form, profession: e.target.value.slice(0, 100) })} placeholder="Ex: Vendedor" className="h-11" maxLength={100} />
               </div>
               <div className="space-y-1.5">
                 <Label>Data de nascimento</Label>
@@ -130,24 +143,24 @@ const RecruiterRegister = () => {
               </div>
               <div className="space-y-1.5">
                 <Label>CPF *</Label>
-                <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: e.target.value })} placeholder="000.000.000-00" className="h-11" required />
+                <Input value={form.cpf} onChange={(e) => setForm({ ...form, cpf: formatCPF(e.target.value) })} placeholder="000.000.000-00" className="h-11" required maxLength={14} />
               </div>
             </div>
 
             <div className="space-y-1.5">
               <Label>Endereço</Label>
-              <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Rua, número, bairro, cidade" className="h-11" />
+              <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value.slice(0, 200) })} placeholder="Rua, número, bairro, cidade" className="h-11" maxLength={200} />
             </div>
 
             <div className="space-y-1.5">
               <Label>Chave PIX *</Label>
-              <Input value={form.pixKey} onChange={(e) => setForm({ ...form, pixKey: e.target.value })} placeholder="CPF, e-mail, telefone ou chave aleatória" className="h-11" required />
+              <Input value={form.pixKey} onChange={(e) => setForm({ ...form, pixKey: e.target.value.slice(0, 100) })} placeholder="CPF, e-mail, telefone ou chave aleatória" className="h-11" required maxLength={100} />
             </div>
 
             <div className="space-y-1.5">
               <Label>Senha *</Label>
               <div className="relative">
-                <Input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Mínimo 6 caracteres" className="h-11 pr-12" required minLength={6} />
+                <Input type={showPassword ? "text" : "password"} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value.slice(0, 128) })} placeholder="Mínimo 6 caracteres" className="h-11 pr-12" required minLength={6} maxLength={128} />
                 <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>

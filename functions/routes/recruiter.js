@@ -9,21 +9,59 @@ const { requireAuth } = require("../middleware/auth");
 const { requireRecruiter } = require("../middleware/recruiter");
 const { logError } = require("../middleware/logger");
 
+// ===================== VALIDATION HELPERS =====================
+
+function validateCPF(cpf) {
+  const cleaned = cpf.replace(/\D/g, "");
+  if (cleaned.length !== 11) return false;
+  if (/^(\d)\1{10}$/.test(cleaned)) return false;
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += parseInt(cleaned[i]) * (10 - i);
+  let check = 11 - (sum % 11);
+  if (check >= 10) check = 0;
+  if (parseInt(cleaned[9]) !== check) return false;
+  sum = 0;
+  for (let i = 0; i < 10; i++) sum += parseInt(cleaned[i]) * (11 - i);
+  check = 11 - (sum % 11);
+  if (check >= 10) check = 0;
+  return parseInt(cleaned[10]) === check;
+}
+
+function validateEmail(email) {
+  if (!email || email.length > 255) return false;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePhone(phone) {
+  const digits = phone.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 11;
+}
+
+function validateName(name) {
+  return name && name.trim().length >= 2 && name.trim().length <= 100;
+}
+
+function validatePassword(password) {
+  return password && password.length >= 6 && password.length <= 128;
+}
+
 // ----- POST /recruiter/register (public) -----
 router.post("/recruiter/register", async (req, res) => {
   try {
     const { name, email, password, whatsapp, profession, birthDate, cpf, address, pixKey, photo, photoContentType } = req.body;
 
-    if (!name || !email || !password || !whatsapp || !cpf || !pixKey) {
-      return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Senha deve ter pelo menos 6 caracteres" });
-    }
+    if (!validateName(name)) return res.status(400).json({ error: "Nome deve ter entre 2 e 100 caracteres" });
+    if (!validateEmail(email)) return res.status(400).json({ error: "E-mail inválido (máx. 255 caracteres)" });
+    if (!validatePassword(password)) return res.status(400).json({ error: "Senha deve ter entre 6 e 128 caracteres" });
+    if (!validatePhone(whatsapp)) return res.status(400).json({ error: "WhatsApp inválido (10-11 dígitos)" });
+    if (!validateCPF(cpf)) return res.status(400).json({ error: "CPF inválido" });
+    if (!pixKey || pixKey.trim().length < 5 || pixKey.trim().length > 100) return res.status(400).json({ error: "Chave PIX inválida (5-100 caracteres)" });
+    if (address && address.length > 200) return res.status(400).json({ error: "Endereço muito longo (máx. 200 caracteres)" });
+    if (profession && profession.length > 100) return res.status(400).json({ error: "Profissão muito longa (máx. 100 caracteres)" });
 
     let userRecord;
     try {
-      userRecord = await admin.auth().createUser({ email, password, displayName: name });
+      userRecord = await admin.auth().createUser({ email: email.trim(), password, displayName: name.trim() });
     } catch (authError) {
       if (authError.code === "auth/email-already-exists") {
         return res.status(409).json({ error: "E-mail já cadastrado.", code: "EMAIL_EXISTS" });
@@ -34,8 +72,8 @@ router.post("/recruiter/register", async (req, res) => {
     const uid = userRecord.uid;
     let photoURL = "";
 
-    // Upload photo if provided
     if (photo) {
+      if (photo.length > 5 * 1024 * 1024) return res.status(400).json({ error: "Foto muito grande (máx 5MB)" });
       try {
         const bucket = admin.storage().bucket();
         const ext = photoContentType === "image/png" ? "png" : "jpg";
@@ -51,14 +89,14 @@ router.post("/recruiter/register", async (req, res) => {
     }
 
     await db.collection("recruiters").doc(uid).set({
-      name,
-      email,
-      whatsapp,
-      profession: profession || "",
+      name: name.trim(),
+      email: email.trim(),
+      whatsapp: whatsapp.trim(),
+      profession: (profession || "").trim().slice(0, 100),
       birthDate: birthDate || null,
-      cpf,
-      address: address || "",
-      pixKey,
+      cpf: cpf.replace(/\D/g, ""),
+      address: (address || "").trim().slice(0, 200),
+      pixKey: pixKey.trim(),
       photoURL,
       commissionPercent: 25,
       totalCommission: 0,
@@ -77,7 +115,7 @@ router.post("/recruiter/register", async (req, res) => {
   }
 });
 
-// ----- GET /recruiter/profile (accessible even if not approved) -----
+// ----- GET /recruiter/profile (accessible even if not approved, also if blocked) -----
 router.get("/recruiter/profile", requireAuth, async (req, res) => {
   try {
     const doc = await db.collection("recruiters").doc(req.uid).get();
@@ -97,6 +135,10 @@ router.put("/recruiter/profile", requireAuth, requireRecruiter, async (req, res)
     for (const field of allowed) {
       if (req.body[field] !== undefined) updateData[field] = req.body[field];
     }
+
+    if (req.body.name && !validateName(req.body.name)) return res.status(400).json({ error: "Nome inválido" });
+    if (req.body.whatsapp && !validatePhone(req.body.whatsapp)) return res.status(400).json({ error: "WhatsApp inválido" });
+
     await db.collection("recruiters").doc(req.uid).update(updateData);
     if (req.body.name) {
       try { await admin.auth().updateUser(req.uid, { displayName: req.body.name }); } catch (e) { /* ignore */ }
@@ -113,6 +155,7 @@ router.post("/recruiter/photo", requireAuth, requireRecruiter, async (req, res) 
   try {
     const { photo, contentType } = req.body;
     if (!photo) return res.status(400).json({ error: "Foto não enviada" });
+    if (photo.length > 5 * 1024 * 1024) return res.status(400).json({ error: "Foto muito grande (máx 5MB)" });
 
     const bucket = admin.storage().bucket();
     const ext = contentType === "image/png" ? "png" : "jpg";
@@ -137,16 +180,15 @@ router.post("/recruiter/clients", requireAuth, requireRecruiter, async (req, res
   try {
     const { name, email, password, whatsapp, profession, plan, birthDate } = req.body;
 
-    if (!name || !email || !password || !whatsapp || !plan) {
-      return res.status(400).json({ error: "Preencha todos os campos obrigatórios" });
-    }
-    if (password.length < 6) {
-      return res.status(400).json({ error: "Senha deve ter pelo menos 6 caracteres" });
-    }
+    if (!validateName(name)) return res.status(400).json({ error: "Nome deve ter entre 2 e 100 caracteres" });
+    if (!validateEmail(email)) return res.status(400).json({ error: "E-mail inválido" });
+    if (!validatePassword(password)) return res.status(400).json({ error: "Senha deve ter entre 6 e 128 caracteres" });
+    if (!validatePhone(whatsapp)) return res.status(400).json({ error: "WhatsApp inválido (10-11 dígitos)" });
+    if (!plan) return res.status(400).json({ error: "Plano é obrigatório" });
 
     let userRecord;
     try {
-      userRecord = await admin.auth().createUser({ email, password, displayName: name });
+      userRecord = await admin.auth().createUser({ email: email.trim(), password, displayName: name.trim() });
     } catch (authError) {
       if (authError.code === "auth/email-already-exists") {
         return res.status(409).json({ error: "E-mail já cadastrado.", code: "EMAIL_EXISTS" });
@@ -159,10 +201,9 @@ router.post("/recruiter/clients", requireAuth, requireRecruiter, async (req, res
     const recruiterData = req.recruiter;
     const commissionPercent = recruiterData.commissionPercent || 25;
 
-    // Create professional doc
     await db.collection("professionals").doc(clientUid).set({
-      name, email, whatsapp,
-      profession: profession || "",
+      name: name.trim(), email: email.trim(), whatsapp: whatsapp.trim(),
+      profession: (profession || "").trim().slice(0, 100),
       plan,
       birthDate: birthDate || null,
       subscriptionStatus: "pending",
@@ -174,7 +215,6 @@ router.post("/recruiter/clients", requireAuth, requireRecruiter, async (req, res
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    // Generate MP payment link
     const mpToken = mercadoPagoToken.value();
     if (!mpToken) {
       return res.status(500).json({ error: "Mercado Pago não configurado." });
@@ -191,7 +231,7 @@ router.post("/recruiter/clients", requireAuth, requireRecruiter, async (req, res
           transaction_amount: selectedPlan.amount,
           currency_id: "BRL",
         },
-        payer_email: email,
+        payer_email: email.trim(),
         back_url: `${APP_BASE_URL}/pagamento-sucesso`,
         external_reference: clientUid,
       }),
@@ -204,9 +244,8 @@ router.post("/recruiter/clients", requireAuth, requireRecruiter, async (req, res
 
     await db.collection("professionals").doc(clientUid).update({ mercadoPagoPreapprovalId: mpData.id });
 
-    // Store in recruiter's clients subcollection
     await db.collection("recruiters").doc(req.uid).collection("clients").doc(clientUid).set({
-      name, email, whatsapp, profession: profession || "", plan,
+      name: name.trim(), email: email.trim(), whatsapp: whatsapp.trim(), profession: (profession || "").trim(), plan,
       paymentStatus: "pending",
       paymentUrl: mpData.init_point,
       mercadoPagoId: mpData.id,
@@ -246,7 +285,6 @@ router.delete("/recruiter/clients/:uid", requireAuth, requireRecruiter, async (r
       return res.status(400).json({ error: "Não é possível excluir cliente com pagamento confirmado" });
     }
 
-    // Delete professional doc and auth user
     await db.collection("professionals").doc(uid).delete();
     try { await admin.auth().deleteUser(uid); } catch (e) { /* ignore */ }
     await db.collection("recruiters").doc(req.uid).collection("clients").doc(uid).delete();
@@ -280,7 +318,6 @@ router.post("/recruiter/withdrawals", requireAuth, requireRecruiter, async (req,
       processedBy: null,
     });
 
-    // Deduct from available balance
     await db.collection("recruiters").doc(req.uid).update({
       availableBalance: admin.firestore.FieldValue.increment(-amount),
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -299,6 +336,33 @@ router.get("/recruiter/withdrawals", requireAuth, requireRecruiter, async (req, 
     const snap = await db.collection("recruiters").doc(req.uid).collection("withdrawals").orderBy("requestedAt", "desc").get();
     const withdrawals = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     return res.status(200).json(withdrawals);
+  } catch (error) {
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// ----- POST /recruiter/contact (for blocked recruiters to contest) -----
+router.post("/recruiter/contact", requireAuth, async (req, res) => {
+  try {
+    const { name, email, message } = req.body;
+    if (!message || message.trim().length < 10 || message.length > 1000) {
+      return res.status(400).json({ error: "Mensagem deve ter entre 10 e 1000 caracteres" });
+    }
+
+    await db.collection("contacts").add({
+      name: (name || "").trim().slice(0, 100),
+      email: (email || "").trim().slice(0, 255),
+      phone: "",
+      subject: "Contestação de bloqueio - Recrutador",
+      message: message.trim(),
+      status: "pending",
+      read: false,
+      recruiterUid: req.uid,
+      createdAt: new Date().toISOString(),
+    });
+
+    return res.status(200).json({ ok: true });
   } catch (error) {
     await logError(req, error);
     return res.status(500).json({ error: error.message });
