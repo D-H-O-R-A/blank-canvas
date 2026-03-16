@@ -7,6 +7,7 @@
 const express = require("express");
 const router = express.Router();
 const { admin, db, mercadoPagoToken, APP_BASE_URL, PLAN_CONFIG } = require("../config");
+const { requireAuth } = require("../middleware/auth");
 const { logError } = require("../middleware/logger");
 
 // ===================== VALIDATION HELPERS =====================
