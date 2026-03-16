@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Eye, EyeOff, LogIn, Ban, Send, Loader2 } from "lucide-react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -31,11 +31,36 @@ const RecruiterLogin = () => {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       const token = await cred.user.getIdToken();
+
+      // Check role — only recruiters allowed here
+      const roleRes = await fetch(`${API_BASE_URL}/check-role`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (roleRes.ok) {
+        const roleData = await roleRes.json();
+        if (roleData.isAdmin) {
+          await signOut(auth);
+          toast({ title: "Erro no login", description: "Esta conta é de administrador. Use o painel administrativo.", variant: "destructive" });
+          return;
+        }
+        if (roleData.isProfessional && !roleData.isRecruiter) {
+          await signOut(auth);
+          toast({ title: "Erro no login", description: "Esta conta é de prestador de serviço. Use o login de profissional.", variant: "destructive" });
+          return;
+        }
+        if (!roleData.isRecruiter) {
+          await signOut(auth);
+          toast({ title: "Erro no login", description: "Nenhum cadastro de recrutador encontrado para este e-mail.", variant: "destructive" });
+          return;
+        }
+      }
+
+      // Check recruiter profile for blocked/pending
       const res = await fetch(`${API_BASE_URL}/recruiter/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) {
-        await auth.signOut();
+        await signOut(auth);
         toast({ title: "Esta conta não é de recrutador", variant: "destructive" });
         return;
       }
@@ -111,7 +136,7 @@ const RecruiterLogin = () => {
                 <Button variant="hero" className="w-full" onClick={() => setShowContactForm(true)}>
                   <Send className="w-4 h-4 mr-2" /> Contestar bloqueio
                 </Button>
-                <Button variant="outline" className="w-full" onClick={() => { setBlocked(false); auth.signOut(); }}>
+                <Button variant="outline" className="w-full" onClick={() => { setBlocked(false); signOut(auth); }}>
                   <ArrowLeft className="w-4 h-4 mr-2" /> Voltar ao login
                 </Button>
               </div>

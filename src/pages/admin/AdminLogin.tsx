@@ -25,20 +25,30 @@ const AdminLogin = () => {
       const result = await signInWithEmailAndPassword(auth, email, password);
       const token = await result.user.getIdToken(true);
 
-      const res = await fetch(`${API_BASE}/admin/check`, {
+      // Check role — only admins allowed here
+      const roleRes = await fetch(`${API_BASE}/check-role`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.isAdmin === true) {
-          navigate("/admin", { replace: true });
+      if (roleRes.ok) {
+        const roleData = await roleRes.json();
+        if (!roleData.isAdmin) {
+          await signOut(auth);
+          if (roleData.isRecruiter) {
+            setError("Esta conta é de recrutador. Use o login de recrutador.");
+          } else if (roleData.isProfessional) {
+            setError("Esta conta é de prestador de serviço. Use o login de profissional.");
+          } else {
+            setError("Acesso negado: este usuário não é administrador.");
+          }
           return;
         }
+        navigate("/admin", { replace: true });
+        return;
       }
 
       await signOut(auth);
-      setError("Acesso negado: este usuário não é administrador.");
+      setError("Erro ao verificar permissões. Tente novamente.");
     } catch (err: any) {
       if (err.code === "auth/invalid-credential" || err.code === "auth/user-not-found" || err.code === "auth/wrong-password") {
         setError("E-mail ou senha incorretos.");
@@ -77,6 +87,7 @@ const AdminLogin = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="admin@exemplo.com"
               required
+              maxLength={255}
             />
           </div>
 
@@ -89,6 +100,7 @@ const AdminLogin = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
+              maxLength={128}
             />
           </div>
 
