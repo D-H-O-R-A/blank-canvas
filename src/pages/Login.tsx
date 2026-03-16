@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Eye, EyeOff, LogIn } from "lucide-react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+
+const API_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net/api";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,7 +23,32 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const token = await cred.user.getIdToken();
+
+      // Check role — only professionals allowed here
+      const res = await fetch(`${API_BASE_URL}/check-role`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.isAdmin) {
+          await signOut(auth);
+          toast({ title: "Erro no login", description: "Esta conta é de administrador. Use o painel administrativo.", variant: "destructive" });
+          return;
+        }
+        if (data.isRecruiter) {
+          await signOut(auth);
+          toast({ title: "Erro no login", description: "Esta conta é de recrutador. Use o login de recrutador.", variant: "destructive" });
+          return;
+        }
+        if (!data.isProfessional) {
+          await signOut(auth);
+          toast({ title: "Erro no login", description: "Nenhum cadastro de profissional encontrado para este e-mail.", variant: "destructive" });
+          return;
+        }
+      }
+
       navigate("/dashboard");
     } catch (error: any) {
       const messages: Record<string, string> = {
@@ -29,6 +56,7 @@ const Login = () => {
         "auth/wrong-password": "Senha incorreta.",
         "auth/invalid-credential": "Credenciais inválidas.",
         "auth/too-many-requests": "Muitas tentativas. Tente novamente mais tarde.",
+        "auth/user-disabled": "Sua conta foi desativada.",
       };
       toast({
         title: "Erro no login",
@@ -73,6 +101,7 @@ const Login = () => {
                 placeholder="seu.email@exemplo.com"
                 className="h-12"
                 required
+                maxLength={255}
               />
             </div>
 
@@ -87,6 +116,7 @@ const Login = () => {
                   placeholder="Sua senha"
                   className="h-12 pr-12"
                   required
+                  maxLength={128}
                 />
                 <button
                   type="button"

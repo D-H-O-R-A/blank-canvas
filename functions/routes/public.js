@@ -181,4 +181,24 @@ router.post("/webhook/mercadopago", async (req, res) => {
   }
 });
 
+// ----- GET /check-role -----
+router.get("/check-role", requireAuth, async (req, res) => {
+  try {
+    const [adminDoc, recruiterDoc, professionalDoc] = await Promise.all([
+      db.collection("admin").doc(req.uid).get(),
+      db.collection("recruiters").doc(req.uid).get(),
+      db.collection("professionals").doc(req.uid).get(),
+    ]);
+    return res.status(200).json({
+      isAdmin: adminDoc.exists && adminDoc.data().isadmin === true,
+      isRecruiter: recruiterDoc.exists,
+      isProfessional: professionalDoc.exists,
+    });
+  } catch (error) {
+    console.error("check-role error:", error);
+    await logError(req, error);
+    return res.status(500).json({ error: "Erro ao verificar papel" });
+  }
+});
+
 module.exports = router;
