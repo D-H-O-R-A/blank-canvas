@@ -16,6 +16,15 @@ const partners = [
   { name: "Sarah Cris", logo: "/lovable-uploads/partner-12.jpeg" },
   { name: "Casa das Bombas", logo: "/lovable-uploads/partner-13.jpeg" },
   { name: "LA Construções", logo: "/lovable-uploads/partner-14.jpeg" },
+  { name: "Açaí God's", logo: "/lovable-uploads/partner-15.jpeg" },
+  { name: "Auto Posto São Judas Tadeu", logo: "/lovable-uploads/partner-16.jpeg" },
+  { name: "Dr. Miquele Adriano", logo: "/lovable-uploads/partner-17.jpeg" },
+  { name: "Empório das Tintas", logo: "/lovable-uploads/partner-18.png" },
+  { name: "Nova", logo: "/lovable-uploads/partner-19.png" },
+  { name: "Ponto da Ressaca", logo: "/lovable-uploads/partner-20.jpeg" },
+  { name: "Master Frio", logo: "/lovable-uploads/partner-21.jpeg" },
+  { name: "Central Energia", logo: "/lovable-uploads/partner-22.jpeg" },
+  { name: "Casa das Calhas Bom Preço", logo: "/lovable-uploads/partner-23.png" },
 ];
 
 export const PartnersSection = () => {
