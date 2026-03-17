@@ -149,9 +149,9 @@ router.post("/webhook/mercadopago", async (req, res) => {
       });
       const preapproval = await mpRes.json();
 
-      if (preapproval.status === "authorized") {
-        const uid = preapproval.external_reference;
-        if (uid) {
+      const uid = preapproval.external_reference;
+      if (uid) {
+        if (preapproval.status === "authorized") {
           const now = new Date();
           const paidUntil = new Date(now);
           paidUntil.setMonth(paidUntil.getMonth() + (preapproval.auto_recurring?.frequency || 1));
@@ -168,6 +168,24 @@ router.post("/webhook/mercadopago", async (req, res) => {
             amount: preapproval.auto_recurring?.transaction_amount,
             paidAt: admin.firestore.FieldValue.serverTimestamp(),
             paidUntil: paidUntil.toISOString(),
+          });
+        } else if (preapproval.status === "cancelled") {
+          await db.collection("professionals").doc(uid).update({
+            subscriptionStatus: "cancelled",
+            cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+
+          await db.collection("logs").add({
+            type: "subscription_cancelled_webhook",
+            uid,
+            preapprovalId: data.id,
+            timestamp: new Date().toISOString(),
+          });
+        } else if (preapproval.status === "paused") {
+          await db.collection("professionals").doc(uid).update({
+            subscriptionStatus: "paused",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
           });
         }
       }
