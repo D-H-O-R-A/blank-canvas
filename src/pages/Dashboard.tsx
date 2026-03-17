@@ -57,6 +57,7 @@ const Dashboard = () => {
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchProfile(); }, [user]);
