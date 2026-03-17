@@ -147,6 +147,28 @@ const Dashboard = () => {
     }
   };
 
+  const handleCancelSubscription = async () => {
+    if (!user) return;
+    setCancelling(true);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch(`${API_BASE_URL}/cancel-subscription`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ reason: "Cancelamento solicitado pelo usuário" }),
+      });
+      if (res.ok) {
+        setProfile((prev) => prev ? { ...prev, subscriptionStatus: "cancelled" } : prev);
+        toast({ title: "Assinatura cancelada com sucesso." });
+      } else {
+        const data = await res.json();
+        toast({ title: data.error || "Erro ao cancelar", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Erro ao cancelar assinatura", variant: "destructive" });
+    } finally { setCancelling(false); }
+  };
+
   const handleLogout = async () => {
     await signOut(auth);
     navigate("/");
