@@ -10,10 +10,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
   User, LogOut, CreditCard, Edit, Save, Clock,
-  Instagram, Facebook, Linkedin, Globe, Camera
+  Instagram, Facebook, Linkedin, Globe, Camera, XCircle, AlertTriangle
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 
 const API_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net/api";
 
