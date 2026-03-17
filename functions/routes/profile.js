@@ -136,4 +136,62 @@ router.post("/create-payment", requireAuth, async (req, res) => {
   }
 });
 
+// ----- POST /cancel-subscription -----
+router.post("/cancel-subscription", requireAuth, async (req, res) => {
+  try {
+    const doc = await db.collection("professionals").doc(req.uid).get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: "Perfil não encontrado" });
+    }
+
+    const profile = doc.data();
+    const preapprovalId = profile.mercadoPagoPreapprovalId;
+
+    if (!preapprovalId) {
+      return res.status(400).json({ error: "Nenhuma assinatura ativa encontrada." });
+    }
+
+    const mpToken = mercadoPagoToken.value();
+    if (!mpToken) {
+      return res.status(500).json({ error: "Mercado Pago não configurado." });
+    }
+
+    // Cancel the preapproval subscription on Mercado Pago
+    const mpResponse = await fetch(`https://api.mercadopago.com/preapproval/${preapprovalId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${mpToken}` },
+      body: JSON.stringify({ status: "cancelled" }),
+    });
+
+    if (!mpResponse.ok) {
+      const mpError = await mpResponse.json();
+      console.error("MP cancel error:", mpError);
+      return res.status(500).json({ error: "Erro ao cancelar assinatura no Mercado Pago." });
+    }
+
+    // Update Firestore
+    await db.collection("professionals").doc(req.uid).update({
+      subscriptionStatus: "cancelled",
+      cancelledAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Log the cancellation
+    await db.collection("logs").add({
+      type: "subscription_cancelled",
+      uid: req.uid,
+      userName: profile.name || profile.email,
+      preapprovalId,
+      reason: req.body.reason || "Cancelamento solicitado pelo usuário",
+      timestamp: new Date().toISOString(),
+    });
+
+    return res.status(200).json({ ok: true });
+  } catch (error) {
+    console.error("cancel-subscription error:", error);
+    await logError(req, error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

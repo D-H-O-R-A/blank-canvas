@@ -10,10 +10,14 @@ import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import {
   User, LogOut, CreditCard, Edit, Save, Clock,
-  Instagram, Facebook, Linkedin, Globe, Camera
+  Instagram, Facebook, Linkedin, Globe, Camera, XCircle, AlertTriangle
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
 
 const API_BASE_URL = "https://us-central1-click-servico.cloudfunctions.net/api";
 
@@ -53,6 +57,7 @@ const Dashboard = () => {
   const [planDialogOpen, setPlanDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { fetchProfile(); }, [user]);
@@ -140,6 +145,28 @@ const Dashboard = () => {
     } catch {
       toast({ title: "Erro ao gerar pagamento", variant: "destructive" });
     }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!user) return;
+    setCancelling(true);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch(`${API_BASE_URL}/cancel-subscription`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ reason: "Cancelamento solicitado pelo usuário" }),
+      });
+      if (res.ok) {
+        setProfile((prev) => prev ? { ...prev, subscriptionStatus: "cancelled" } : prev);
+        toast({ title: "Assinatura cancelada com sucesso." });
+      } else {
+        const data = await res.json();
+        toast({ title: data.error || "Erro ao cancelar", variant: "destructive" });
+      }
+    } catch {
+      toast({ title: "Erro ao cancelar assinatura", variant: "destructive" });
+    } finally { setCancelling(false); }
   };
 
   const handleLogout = async () => {
@@ -323,9 +350,13 @@ const Dashboard = () => {
               <div className="bg-primary/5 rounded-xl p-3 sm:p-4">
                 <div className="text-xs text-muted-foreground mb-1">Status</div>
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${profile?.subscriptionStatus === "active" ? "bg-primary" : "bg-yellow-500"}`} />
+                  <div className={`w-2 h-2 rounded-full ${
+                    profile?.subscriptionStatus === "active" ? "bg-primary" :
+                    profile?.subscriptionStatus === "cancelled" ? "bg-destructive" : "bg-yellow-500"
+                  }`} />
                   <span className="font-bold text-foreground">
-                    {profile?.subscriptionStatus === "active" ? "Ativo" : "Pendente"}
+                    {profile?.subscriptionStatus === "active" ? "Ativo" :
+                     profile?.subscriptionStatus === "cancelled" ? "Cancelado" : "Pendente"}
                   </span>
                 </div>
               </div>
@@ -338,10 +369,44 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <Button variant="hero" onClick={() => { setSelectedPlan(profile?.plan || "1 mês"); setPlanDialogOpen(true); }} className="w-full sm:w-auto">
-              <CreditCard className="w-4 h-4 mr-2" />
-              Renovar / Trocar plano
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button variant="hero" onClick={() => { setSelectedPlan(profile?.plan || "1 mês"); setPlanDialogOpen(true); }} className="w-full sm:w-auto">
+                <CreditCard className="w-4 h-4 mr-2" />
+                {profile?.subscriptionStatus === "cancelled" ? "Reativar assinatura" : "Renovar / Trocar plano"}
+              </Button>
+
+              {profile?.subscriptionStatus === "active" && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" className="w-full sm:w-auto text-destructive border-destructive/30 hover:bg-destructive/10">
+                      <XCircle className="w-4 h-4 mr-2" />
+                      Cancelar assinatura
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center gap-2">
+                        <AlertTriangle className="w-5 h-5 text-destructive" />
+                        Cancelar assinatura
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Tem certeza que deseja cancelar sua assinatura? A cobrança recorrente será interrompida e seu acesso ficará ativo até o fim do período pago.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Voltar</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={handleCancelSubscription}
+                        disabled={cancelling}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        {cancelling ? "Cancelando..." : "Confirmar cancelamento"}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           </motion.div>
         </div>
       </div>
